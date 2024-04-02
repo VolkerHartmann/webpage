@@ -77,6 +77,12 @@ If you now obtain the patched resource you'll see that there are two alternate i
 {% capture my_include %}{% include_relative snippets/get-patched-resource-complex/http-response.md %}{% endcapture %}
 {{ my_include | markdownify }}
 
+---
+**NOTE**
+While many list-based properties, e.g., alternateIdentifiers, creators, titles, are handles as lists, which implies that they stick to a defined order, some properties are implemented as arrays without ensuring any order. This applies to 'creators.affiliations', 'contributors.affiliations', 'sizes', and 'formats'. Patching a certain index of these properties may result in a different element position than expected.
+
+---
+
 Besides the possiblity of patching resources there is also the option to apply updates to an existing resource via HTTP PUT. This rather traditional approach requires the user to read a resource,
 apply updates locally and send the modified resource back to the server. This approach may seem more intuitive but can also causes a comparibly huge overhead as also unchanged content is sent between
 client and server. To illustrate the impact, let's go back to the update example in the beginning. In order to update the publication year the following requests are necessary:
