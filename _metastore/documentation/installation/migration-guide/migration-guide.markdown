@@ -26,6 +26,8 @@ If the values should not correspond to the default value, please add the adjuste
 'config/application.properties'.
 
 ## Versions
+- [v1.4.2](#v142)
+- [v1.4.1](#v141)
 - [v1.4.0](#v140)
 - [v1.3.0](#v130)
 - [v1.2.3](#v123)
@@ -34,6 +36,12 @@ If the values should not correspond to the default value, please add the adjuste
 - [v1.2.0](#v120)
 - [v1.1.0](#v110)
 - [v1.0.1](#v101)
+
+## v1.4.2
+Nothing to migrate.
+
+## v1.4.1
+Nothing to migrate.
 
 ## v1.4.0
 ### Settings

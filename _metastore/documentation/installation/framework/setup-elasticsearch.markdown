@@ -11,7 +11,7 @@ navigation_id: metastore_instal
 # {{ page.title }} 
 --- 
 NOTE
-: Right now only elasticsearch 7.x is supported by MetaStore.
+: Only tested with elasticsearch 7.x and 8.x.
 
 --- 
 
@@ -35,6 +35,8 @@ Final step: Install elasticsearch from registered repository
 ```
 root@server:~# apt-get update && apt-get install elasticsearch
 ```
+## Links
+- [Installing Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/install-elasticsearch.html)
 
 <style>
 td, th {
