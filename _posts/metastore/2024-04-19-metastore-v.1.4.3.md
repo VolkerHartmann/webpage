@@ -19,6 +19,7 @@ Today, we like to announce version 1.4.3 of the MetaStore service. Below, you ca
 * Bump org.apache.commons:commons-text from 1.11.0 to 1.12.0 @dependabot in [PR 498](https://github.com/kit-data-manager/metastore2/pull/498)
 * Bump org.springframework.boot from 3.2.4 to 3.2.5 by @dependabot in [PR 499](https://github.com/kit-data-manager/metastore2/pull/499)
 * Bump org.springframework.cloud:spring-cloud-gateway-mvc from 4.1.2 to 4.1.3 by @dependabot in [PR 497](https://github.com/kit-data-manager/metastore2/pull/497)
+* Bump org.springframework.data:spring-data-elasticsearch from 5.2.4 to 5.2.5 by @dependabot in [PR 494](https://github.com/kit-data-manager/metastore2/pull/494)
 
 
 If you face any issues, please file an [issue at GitHub](https://github.com/kit-data-manager/metastore2/issues). 
