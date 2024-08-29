@@ -10,7 +10,17 @@ navigation_id: fair_do_lab_index
 
 # {{ page.title }}
 
-The FAIR DO Lab contains user interfaces to demonstrate the services. Not all of them are meant for production.
+The FAIR DO Lab contains user interfaces to demonstrate the services.
+
+## Frontend-Collection
+
+Our [Demo-Page](https://demo.datamanager.kit.edu/dashboard.html) has a few user interfaces which are being configured with a FAIR DO Lab instance. It is currently not directly integrated with the FAIR DO Lab, but you can set up your own instance using the instructions in [the frontend-collection repository](https://github.com/kit-data-manager/frontend-collection/).
+
+## FAIR-DOscope
+
+> FAIR-DOscope is an easy-to-use, generic FAIR Digital Object viewer and browser accepting PIDs of FAIR DOs and presenting the associated PID record in a graphical and user-friendly way. It offers a tabular view of the contents of a PID record and a graphical representation of related FAIR DOs. ([FAIR-DOscope section](../fairdoscope/index.html))
+
+Details can be found on the [FAIR-DOscope section](../fairdoscope/index.html).
 
 ## Kibana
 
