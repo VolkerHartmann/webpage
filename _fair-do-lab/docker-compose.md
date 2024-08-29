@@ -3,8 +3,8 @@ title: Local setup
 breadcrumbs: /typed-pid-maker/local-setup
 layout: default
 description: Local setup using docker-compose.
-repository_url: https://github.com/kit-data-manager/testbed4inf
-repository_name: kit-data-manager/testbed4inf
+repository_url: https://github.com/kit-data-manager/FAIR-DO-Lab
+repository_name: kit-data-manager/FAIR-DO-Lab
 navigation_id: fair_do_lab_index
 ---
 
@@ -27,7 +27,7 @@ The whole setup is based on docker-compose.
 
 ## Download
 
-You will need to get the [repository content](https://github.com/kit-data-manager/testbed4inf.git) to set everything up. Either download and extract the content or use `git clone https://github.com/kit-data-manager/testbed4inf.git`.
+You will need to get the [repository content](https://github.com/kit-data-manager/FAIR-DO-Lab.git) to set everything up. Either download and extract the content or use `git clone https://github.com/kit-data-manager/FAIR-DO-Lab.git`.
 
 ## Docker-compose setup
 

@@ -404,7 +404,7 @@ fair_do_lab_index:
           - page: APIs
             url: fair-do-lab/apis.html
           - page: Source Code
-            external_url: https://github.com/kit-data-manager/testbed4inf
+            external_url: https://github.com/kit-data-manager/FAIR-DO-Lab
       - title: Administrators
         subfolderitems:
           - page: Status and Stability

@@ -3,8 +3,8 @@ title: Configuring the FAIR DO Lab
 breadcrumbs: /typed-pid-maker/configuration
 layout: default
 description: Configuring single components.
-repository_url: https://github.com/kit-data-manager/testbed4inf
-repository_name: kit-data-manager/testbed4inf
+repository_url: https://github.com/kit-data-manager/FAIR-DO-Lab
+repository_name: kit-data-manager/FAIR-DO-Lab
 navigation_id: fair_do_lab_index
 ---
 
@@ -71,9 +71,3 @@ The following properties define the communication with RabbitMQ.
     - The queue that will be registered for the indexer. Should be unique, except the plan is to have multiple indexers for parallelization.
 - `repo.messaging.receiver.routingKeys: pidrecord.#`
     - The "routingKeys" or "topics" of the messages which should be indexed. The `#` is similar to `*` in regular expressions in this example. `pidrecord` is the topic prefix that the Typed PID Maker uses (e.g. `pidrecord.create`).
-
-## Fairris
-
-Configuration sub-folder: `fairris`
-
-Fairris is a small user interface for *purely DEMO purposes*. It allows you to create and update minimalistic FAIR DOs using the Typed PID Maker. The current version has no configuration options.
