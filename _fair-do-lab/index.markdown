@@ -3,8 +3,8 @@ title: FAIR DO Lab
 breadcrumbs: /fair-do-lab/
 layout: default
 description: A configurable FAIR DO blueprint architecture.
-repository_url: https://github.com/kit-data-manager/testbed4inf
-repository_name: kit-data-manager/testbed4inf
+repository_url: https://github.com/kit-data-manager/FAIR-DO-Lab
+repository_name: kit-data-manager/FAIR-DO-Lab
 navigation_id: fair_do_lab_index
 tag-name: fair-do-lab
 ---

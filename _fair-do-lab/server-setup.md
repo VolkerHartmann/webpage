@@ -3,8 +3,8 @@ title: FAIR DO Lab - Server Setup
 breadcrumbs: /typed-pid-maker/apis
 layout: default
 description: Additions which apply to server-setups.
-repository_url: https://github.com/kit-data-manager/testbed4inf
-repository_name: kit-data-manager/testbed4inf
+repository_url: https://github.com/kit-data-manager/FAIR-DO-Lab
+repository_name: kit-data-manager/FAIR-DO-Lab
 navigation_id: fair_do_lab_index
 ---
 

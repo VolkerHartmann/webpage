@@ -3,8 +3,8 @@ title: FAIR DO Lab - User Interfaces
 breadcrumbs: /typed-pid-maker/ui-guide
 layout: default
 description: Demo interfaces for exporation.
-repository_url: https://github.com/kit-data-manager/testbed4inf
-repository_name: kit-data-manager/testbed4inf
+repository_url: https://github.com/kit-data-manager/FAIR-DO-Lab
+repository_name: kit-data-manager/FAIR-DO-Lab
 navigation_id: fair_do_lab_index
 ---
 

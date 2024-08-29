@@ -3,8 +3,8 @@ title: FAIR DO Lab - APIs
 breadcrumbs: /typed-pid-maker/apis
 layout: default
 description: API descriptions of the Labs components.
-repository_url: https://github.com/kit-data-manager/testbed4inf
-repository_name: kit-data-manager/testbed4inf
+repository_url: https://github.com/kit-data-manager/FAIR-DO-Lab
+repository_name: kit-data-manager/FAIR-DO-Lab
 navigation_id: fair_do_lab_index
 ---
 
