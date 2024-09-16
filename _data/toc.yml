@@ -424,6 +424,8 @@ ro-crate-java_index:
             url: ro-crate-java/introduction.html
           - page: Specification Examples
             url: ro-crate-java/examples.html
+          - page: API documentation (Javadoc)
+            external_url: https://javadoc.io/doc/edu.kit.datamanager/ro-crate-java/
       - title: Developers
         subfolderitems:
           - page: Source Code
