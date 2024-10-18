@@ -17,6 +17,8 @@ Easy findability and accessibility are important for the efficient re-use of res
 - Are there size limitations for datasets?
 - Are there publication costs?
 
+A SPARQL endpoint is available at [data-collections.nfdi4ing.de/dce](https://data-collections.nfdi4ing.de/dce). Documentation about the structure of the graph and how to query it can be found [here](https://github.com/kit-data-manager/Data-Collections-Explorer-Graph/blob/main/README.md).
+
 ## Features
 
 * Filtering for type, subject area, Open Access
