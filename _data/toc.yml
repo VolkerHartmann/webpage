@@ -165,8 +165,10 @@ metastore_index:
         subfolderitems:
         - page: OpenAPI Definition
           url: metastore/documentation/api-docs.html
-        - page: REST API
-          url: metastore/documentation/REST/index.html
+        - page: REST API v1
+          url: metastore/documentation/REST/APIv1/index.html
+        - page: REST API v2
+          url: metastore/documentation/REST/APIv2/index.html
         - page: Source Code
           external_url: https://github.com/kit-data-manager/metastore2
         - page: Issue Tracker
@@ -184,7 +186,7 @@ metastore_index:
           - page: Migration from older version
             url: metastore/documentation/installation/migration-guide/migration-guide.html
 metastore_doc_rest:
-  - title: 
+  - title: API v1
     subfolderitems:
       - title: General
         subfolderitems:
@@ -203,43 +205,100 @@ metastore_doc_rest:
       - title: Schema Management
         subfolderitems:
         - page: Introduction
-          url: metastore/documentation/REST/introduction-schema.html
+          url: metastore/documentation/REST/APIv1/introduction-schema.html
         - page: Register a Schema
-          url: metastore/documentation/REST/register-schema.html
+          url: metastore/documentation/REST/APIv1/register-schema.html
         - page: Getting a Metadata Schema Record
-          url: metastore/documentation/REST/get-schema-record.html
+          url: metastore/documentation/REST/APIv1/get-schema-record.html
         - page: Getting a Metadata Schema Document
-          url: metastore/documentation/REST/get-schema-document.html
+          url: metastore/documentation/REST/APIv1/get-schema-document.html
         - page: Updating a Metadata Schema Document
-          url: metastore/documentation/REST/update-schema.html
+          url: metastore/documentation/REST/APIv1/update-schema.html
         - page: Getting a List of Metadata Schema Records
-          url: metastore/documentation/REST/list-schema-records.html
+          url: metastore/documentation/REST/APIv1/list-schema-records.html
         - page: Getting a List of all Schema Records for a Specific SchemaId
-          url: metastore/documentation/REST/list-specific-schema-records.html
+          url: metastore/documentation/REST/APIv1/list-specific-schema-records.html
         - page: Getting a specific Version of Metadata Schema Document
-          url: metastore/documentation/REST/get-specific-schema-document.html
+          url: metastore/documentation/REST/APIv1/get-specific-schema-document.html
         - page: Validating Metadata Document
-          url: metastore/documentation/REST/update-schema.html
+          url: metastore/documentation/REST/APIv1/update-schema.html
       - title: Metadata Management
         subfolderitems:
         - page: Introduction
-          url: metastore/documentation/REST/introduction-metadata.html
+          url: metastore/documentation/REST/APIv1/introduction-metadata.html
         - page: Register/Ingest a Metadata Record with Metadata Document
-          url: metastore/documentation/REST/register-metadata.html
+          url: metastore/documentation/REST/APIv1/register-metadata.html
         - page: Accessing Metadata Document
-          url: metastore/documentation/REST/get-metadata-document.html
+          url: metastore/documentation/REST/APIv1/get-metadata-document.html
         - page: Accessing Metadata Record
-          url: metastore/documentation/REST/get-metadata-record.html
+          url: metastore/documentation/REST/APIv1/get-metadata-record.html
         - page: Updating a Metadata Record
-          url: metastore/documentation/REST/update-metadata-record.html
+          url: metastore/documentation/REST/APIv1/update-metadata-record.html
         - page: Getting a List of all Metadata Records
-          url: metastore/documentation/REST/find-metadata-records.html
+          url: metastore/documentation/REST/APIv1/find-metadata-records.html
         - page: Filter Metadata Records by Document Id
-          url: metastore/documentation/REST/filter-metadata-records-by-id.html
+          url: metastore/documentation/REST/APIv1/filter-metadata-records-by-id.html
         - page: Filter Metadata Records by Related Resource
-          url: metastore/documentation/REST/filter-metadata-records-by-related-resource.html
+          url: metastore/documentation/REST/APIv1/filter-metadata-records-by-related-resource.html
         - page: Filter Metadata Records by Date
-          url: metastore/documentation/REST/filter-metadata-records-by-date.html
+          url: metastore/documentation/REST/APIv1/filter-metadata-records-by-date.html
+metastore_doc_rest_v2:
+  - title: API v2
+    subfolderitems:
+      - title: General
+        subfolderitems:
+          - page: The MetaStore Service
+            url: metastore/index.html
+          - page: Documentation
+            url: metastore/documentation/index.html
+          - page: Docker Images
+            external_url: https://github.com/orgs/kit-data-manager/packages?repo_name=metastore2
+          - page: News Archive
+            url: metastore/news.html
+      - title: Documentation (REST API)
+        subfolderitems:
+        - page: Introduction
+          url: metastore/documentation/index.html
+      - title: Schema Management
+        subfolderitems:
+        - page: Introduction
+          url: metastore/documentation/REST/APIv2/introduction-schema.html
+        - page: Register a Schema
+          url: metastore/documentation/REST/APIv2/register-schema.html
+        - page: Getting a Metadata Schema Record
+          url: metastore/documentation/REST/APIv2/get-schema-record.html
+        - page: Getting a Metadata Schema Document
+          url: metastore/documentation/REST/APIv2/get-schema-document.html
+        - page: Updating a Metadata Schema Document
+          url: metastore/documentation/REST/APIv2/update-schema.html
+        - page: Getting a List of Metadata Schema Records
+          url: metastore/documentation/REST/APIv2/list-schema-records.html
+        - page: Getting a List of all Schema Records for a Specific SchemaId
+          url: metastore/documentation/REST/APIv2/list-specific-schema-records.html
+        - page: Getting a specific Version of Metadata Schema Document
+          url: metastore/documentation/REST/APIv2/get-specific-schema-document.html
+        - page: Validating Metadata Document
+          url: metastore/documentation/REST/APIv2/update-schema.html
+      - title: Metadata Management
+        subfolderitems:
+        - page: Introduction
+          url: metastore/documentation/REST/APIv2/introduction-metadata.html
+        - page: Register/Ingest a Metadata Record with Metadata Document
+          url: metastore/documentation/REST/APIv2/register-metadata.html
+        - page: Accessing Metadata Document
+          url: metastore/documentation/REST/APIv2/get-metadata-document.html
+        - page: Accessing Metadata Record
+          url: metastore/documentation/REST/APIv2/get-metadata-record.html
+        - page: Updating a Metadata Record
+          url: metastore/documentation/REST/APIv2/update-metadata-record.html
+        - page: Getting a List of all Metadata Records
+          url: metastore/documentation/REST/APIv2/find-metadata-records.html
+        - page: Filter Metadata Records by Document Id
+          url: metastore/documentation/REST/APIv2/filter-metadata-records-by-id.html
+        - page: Filter Metadata Records by Related Resource
+          url: metastore/documentation/REST/APIv2/filter-metadata-records-by-related-resource.html
+        - page: Filter Metadata Records by Date
+          url: metastore/documentation/REST/APIv2/filter-metadata-records-by-date.html
 metastore_doc:
   - title: Documentation
     subfolderitems:
@@ -259,8 +318,10 @@ metastore_doc:
             url: metastore/documentation/installation/index.html
           - page: OpenAPI Definition
             url: metastore/documentation/api-docs.html
-          - page: REST API
-            url: metastore/documentation/REST/index.html
+          - page: REST API V1
+            url: metastore/documentation/REST/APIv1/index.html
+          - page: REST API V2
+            url: metastore/documentation/REST/APIv2/index.html
           - page: Web Frontend
             url: metastore/documentation/frontend/index.html
           - page: Embedded GUI

@@ -26,6 +26,7 @@ If the values should not correspond to the default value, please add the adjuste
 'config/application.properties'.
 
 ## Versions
+- [v2.0.0](#v200)
 - [v1.4.4](#v144)
 - [v1.4.3](#v143)
 - [v1.4.2](#v142)
@@ -38,6 +39,27 @@ If the values should not correspond to the default value, please add the adjuste
 - [v1.2.0](#v120)
 - [v1.1.0](#v110)
 - [v1.0.1](#v101)
+
+## v2.0.0
+### System Requirements
+ATTENTION
+: MetaStore requires Java 21 or later. Java 8 and 17 are no longer supported. 
+
+### Database changes
+ATTENTION
+: There are some minor changes in the database due to migration to DataCite.
+
+Please start the new version once with an additional parameter to migrate to
+the new database structure.
+This will also migrate the elasticsearch index (if available).
+
+```
+$ run.sh --migrate2DataCite
+[...]
+2024-11-25T10:04:55.670+01:00  INFO 54393 --- [           main] e.k.datamanager.metastore2.Application   : Spring is running!
+```
+Note
+: 'Spring is running' only appears if log level is set to 'INFO' at least!
 
 ## v1.4.4
 Nothing to migrate.
