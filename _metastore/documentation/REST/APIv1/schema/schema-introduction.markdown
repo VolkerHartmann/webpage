@@ -1,6 +1,6 @@
 ---
 title: Documentation (REST API)
-breadcrumbs: /metastore/documentation/
+breadcrumbs: /metastore/documentation/APIv1/
 layout: default
 description: A Research Data Repository Service for Managing Metadata Documents based on JSON or XML.
 repository_url: https://github.com/kit-data-manager/metastore2

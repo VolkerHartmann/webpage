@@ -1,6 +1,6 @@
 ---
 title: Getting a List of Metadata Schema Records
-breadcrumbs: /metastore/documentation/REST/Getting a Metadata Schema Document
+breadcrumbs: /metastore/documentation/REST/GAPIv1/etting a Metadata Schema Document
 layout: default
 description: A Research Data Repository Service for Managing Metadata Documents based on JSON or XML.
 repository_url: https://github.com/kit-data-manager/metastore2

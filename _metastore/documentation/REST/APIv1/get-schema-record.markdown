@@ -1,6 +1,6 @@
 ---
 title: Getting a Metadata Schema Record
-breadcrumbs: /metastore/documentation/REST/Getting a Metadata Schema Record
+breadcrumbs: /metastore/documentation/REST/APIv1/Getting a Metadata Schema Record
 layout: default
 description: A Research Data Repository Service for Managing Metadata Documents based on JSON or XML.
 repository_url: https://github.com/kit-data-manager/metastore2

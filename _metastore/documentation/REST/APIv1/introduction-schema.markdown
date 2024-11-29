@@ -1,6 +1,6 @@
 ---
 title: Schema Registration and Management
-breadcrumbs: /metastore/documentation/REST/introduction schema
+breadcrumbs: /metastore/documentation/REST/APIv1/introduction schema
 layout: default
 description: A Research Data Repository Service for Managing Metadata Documents based on JSON or XML.
 repository_url: https://github.com/kit-data-manager/metastore2
