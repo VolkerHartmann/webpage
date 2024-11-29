@@ -18,7 +18,8 @@ It is splitted in six parts:
 - [Migration Guide](installation/migration-guide/migration-guide.html)
 
 ### Documentation & Manuals
-- [REST Documentation](REST/index.html)
+- [REST Documentation (API v1)](REST/APIv1/index.html)
+- [REST Documentation (API v2)](REST/APIv2/index.html)
 - [OpenAPI Definition](api-docs.html)
-- [Web Frontend](frontend/index.html)
+- [Web Frontend ()](APIv1/index.html)
 - [GUI (external link)](https://kit-data-manager.github.io/metastore2)

@@ -20,12 +20,15 @@ For older versions (< 1.3.1) you also have to overwrite run.sh with the new vers
 updating link of metastore2.jar to newest version should be sufficient.
 
 Before starting the new version you should check the migration guide for any changes.
+Even though it is not specifically mentioned, it is always a good idea to do a backup before upgrading. 
+(See [Backup](../framework/backup-metastore.html))
 
 Add the new settings to 'application.properties' (if not recommended otherwise).
 If the values should not correspond to the default value, please add the adjusted values to 
 'config/application.properties'.
 
 ## Versions
+- [v2.0.0](#v200)
 - [v1.4.4](#v144)
 - [v1.4.3](#v143)
 - [v1.4.2](#v142)
@@ -38,6 +41,29 @@ If the values should not correspond to the default value, please add the adjuste
 - [v1.2.0](#v120)
 - [v1.1.0](#v110)
 - [v1.0.1](#v101)
+
+## v2.0.0
+### System Requirements
+ATTENTION
+: MetaStore requires Java 21 or later. Java 8 and 17 are no longer supported. 
+
+### Database changes
+ATTENTION
+: There are some minor changes in the database due to migration to DataCite.
+: You shoud backup at least your database before upgrading. (see [Backup](../framework/backup-metastore.html))
+
+Please start the new version once with an additional parameter to migrate to
+the new database structure.
+This will also migrate the elasticsearch index (if available).
+
+```
+$ run.sh --migrate2DataCite
+[...]
+2024-11-25T10:04:55.670+01:00  INFO 54393 --- [           main] e.k.datamanager.metastore2.Application   : Spring is running!
+```
+Note
+: 'Spring is running' only appears if log level is set to 'INFO' at least!
+: We recommend to set LOG level at least to INFO to see if migration is finished.
 
 ## v1.4.4
 Nothing to migrate.

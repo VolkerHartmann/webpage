@@ -1,1 +1,4485 @@
-{"openapi":"3.0.1","info":{"title":"MetaStore Microservice - RESTful API","description":"This webpage describes the RESTful interface of the KIT Data Manager MetaStore Microservice.","contact":{"name":"KIT Data Manager Support","url":"https://github.com/kit-data-manager","email":"support@datamanager.kit.edu"},"license":{"name":"Apache 2.0","url":"http://www.apache.org/licenses/LICENSE-2.0.html"},"version":"1.0.0"},"servers":[{"url":"http://localhost:8040","description":"Generated server url"}],"paths":{"/api/v1/schemas/{schemaId}":{"get":{"tags":["Schema Registry"],"summary":"Get schema record by schema id (and version).","description":"Obtain is single schema record by its schema id. Depending on a user's role, accessing a specific record may be allowed or forbidden. Furthermore, a specific version of the record can be returned by providing a version number as request parameter. If no version is specified, the most recent version is returned.","operationId":"getSchemaDocumentById_1","parameters":[{"name":"schemaId","in":"path","description":"The schema id.","required":true,"schema":{"type":"string"}},{"name":"version","in":"query","description":"The version of the record.","required":false,"schema":{"type":"integer","format":"int64"}}],"responses":{"200":{"description":"OK and the record is returned if the record exists and the user has sufficient permission.","content":{"application/hal+json":{"schema":{"type":"string"}},"application/vnd.datamanager.schema-record+json":{"schema":{"$ref":"#/components/schemas/MetadataSchemaRecord"}}}},"404":{"description":"Not found is returned, if no record for the provided id and version was found.","content":{"application/hal+json":{"schema":{"type":"string"}}}},"401":{"description":"Unauthorized is returned if authorization in required but was not provided.","content":{"application/hal+json":{"schema":{"type":"string"}}}},"403":{"description":"Forbidden is returned if the caller has no sufficient privileges.","content":{"application/hal+json":{"schema":{"type":"string"}}}}}},"put":{"tags":["Schema Registry"],"summary":"Update a schema record.","description":"Apply an update to the schema record and/or schema document with the provided schema id. The update capabilities for a schema record are quite limited. An update is always related to the most recent version. Only the associated mimeType and acl can be changed.  All other fields are updated automatically or are read-only. Updating only the metadata record does not affect the version number. A new version is only created while providing a (new) schema document.","operationId":"updateRecord","parameters":[{"name":"schemaId","in":"path","description":"The schema id.","required":true,"schema":{"type":"string"}},{"name":"If-Match","in":"header","description":"ETag of the object. Please use quotation marks!","required":true}],"requestBody":{"content":{"multipart/form-data":{"schema":{"type":"object","properties":{"record":{"type":"string","description":"Json representation of the schema record.","format":"binary"},"schema":{"type":"string","description":"The metadata schema document associated with the record.","format":"binary"}}}}}},"responses":{"200":{"description":"OK is returned in case of a successful update. The updated record is returned in the response.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/MetadataSchemaRecord"}}}},"400":{"description":"Bad Request is returned if the provided schema record/schema document is invalid.","content":{"application/json":{"schema":{"type":"string"}}}},"404":{"description":"Not Found is returned if no record for the provided id was found.","content":{"application/json":{"schema":{"type":"string"}}}},"401":{"description":"Unauthorized is returned if authorization in required but was not provided.","content":{"application/json":{"schema":{"type":"string"}}}},"403":{"description":"Forbidden is returned if the caller has no sufficient privileges.","content":{"application/json":{"schema":{"type":"string"}}}}}},"delete":{"tags":["Schema Registry"],"summary":"Delete a schema record.","description":"Delete a single schema record. Deleting a record typically requires the caller to have special permissions. In some cases, deleting a record can also be available for the owner or other privileged users or can be forbidden at all. Deletion of a record affects all versions of the particular record.","operationId":"deleteRecord","parameters":[{"name":"schemaId","in":"path","description":"The schema id.","required":true,"schema":{"type":"string"}},{"name":"If-Match","in":"header","description":"ETag of the object. Please use quotation marks!","required":true}],"responses":{"204":{"description":"No Content is returned as long as no error occurs while deleting a record. Multiple delete operations to the same record will also return HTTP 204 even if the deletion succeeded in the first call.","content":{"application/hal+json":{"schema":{"type":"string"}}}},"401":{"description":"Unauthorized is returned if authorization in required but was not provided.","content":{"application/hal+json":{"schema":{"type":"string"}}}},"403":{"description":"Forbidden is returned if the caller has no sufficient privileges.","content":{"application/hal+json":{"schema":{"type":"string"}}}}}}},"/api/v1/metadata/{id}":{"get":{"tags":["Metadata Repository"],"summary":"Get a metadata record by id.","description":"Obtain a single record by its resource identifier. Depending on a user's role, accessing a specific record may be allowed or forbidden. Furthermore, a specific version of the record can be returned by providing a version number as request parameter.","operationId":"getMetadataDocumentById_1_1","parameters":[{"name":"id","in":"path","description":"The record identifier or related resource identifier.","required":true,"schema":{"type":"string"}},{"name":"version","in":"query","description":"The version of the record. This parameter only has an effect if versioning  is enabled.","required":false,"schema":{"type":"integer","format":"int64"}}],"responses":{"200":{"description":"OK and the record is returned if the record exists and the user has sufficient permission.","content":{"application/hal+json":{"schema":{"type":"string"}},"application/vnd.datamanager.metadata-record+json":{"schema":{"$ref":"#/components/schemas/MetadataRecord"}},"application/vnd.datamanager.acl+json":{"schema":{"$ref":"#/components/schemas/MetadataRecord"}}}},"404":{"description":"Not found is returned, if no record for the provided id or version was found.","content":{"application/hal+json":{"schema":{"type":"string"}}}},"401":{"description":"Unauthorized is returned if authorization in required but was not provided.","content":{"application/hal+json":{"schema":{"type":"string"}}}},"403":{"description":"Forbidden is returned if the caller has no sufficient privileges.","content":{"application/hal+json":{"schema":{"type":"string"}}}}}},"put":{"tags":["Metadata Repository"],"summary":"Update a metadata record and/or metadata document.","description":"Apply an update to the metadata record with the provided resource identifier and/or its accociated metadata document.If versioning is enabled and a (new) metadata document is provided, a new version of the record is created. Otherwise, the record and/or its metadata document are overwritten.","operationId":"updateRecord_1","parameters":[{"name":"id","in":"path","description":"The resource identifier.","required":true,"schema":{"type":"string"}},{"name":"If-Match","in":"header","description":"ETag of the object. Please use quotation marks!","required":true}],"requestBody":{"content":{"multipart/form-data":{"schema":{"type":"object","properties":{"record":{"type":"string","description":"JSON representation of the metadata record.","format":"binary"},"document":{"type":"string","description":"The metadata document associated with the record. The document must match the schema defined in the record.","format":"binary"}}}}}},"responses":{"200":{"description":"OK is returned in case of a successful update, e.g. the record (if provided) was in the correct format and the document (if provided) matches the provided schema id.The updated record is returned in the response.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/MetadataRecord"}}}},"400":{"description":"Bad Request is returned if the provided metadata record is invalid or if the validation using the provided schema failed.","content":{"application/json":{"schema":{"type":"string"}}}},"404":{"description":"Not Found is returned if no record for the provided id or no schema for the provided schema id was found.","content":{"application/json":{"schema":{"type":"string"}}}},"401":{"description":"Unauthorized is returned if authorization in required but was not provided.","content":{"application/json":{"schema":{"type":"string"}}}},"403":{"description":"Forbidden is returned if the caller has no sufficient privileges.","content":{"application/json":{"schema":{"type":"string"}}}}}},"delete":{"tags":["Metadata Repository"],"summary":"Delete a record.","description":"Delete a single metadata record and the associated metadata document linked with the provided resource identifier. Deleting a record typically requires the caller to have special permissions. In some cases, deleting a record can also be available for the owner or other privileged users or can be forbidden at all. Deletion of a record affects all versions of the particular record.","operationId":"deleteRecord_1","parameters":[{"name":"id","in":"path","description":"The resource identifier.","required":true,"schema":{"type":"string"}},{"name":"If-Match","in":"header","description":"ETag of the object. Please use quotation marks!","required":true}],"responses":{"204":{"description":"No Content is returned as long as no error occurs while deleting a record. Multiple delete operations to the same record will also return HTTP 204 even if the deletion succeeded in the first call.","content":{"application/hal+json":{"schema":{"type":"string"}}}},"401":{"description":"Unauthorized is returned if authorization in required but was not provided.","content":{"application/hal+json":{"schema":{"type":"string"}}}},"403":{"description":"Forbidden is returned if the caller has no sufficient privileges.","content":{"application/hal+json":{"schema":{"type":"string"}}}}}}},"/api/v1/schemas":{"get":{"tags":["Schema Registry"],"summary":"Get all schema records.","description":"List all schema records in a paginated and/or sorted form. The result can be refined by providing schemaId, a list of one or more mimetypes and/or a date range. Returned schema record(s) must match. if 'schemaId' is provided all other parameters were skipped and all versions of the given schemaId record will be returned. If 'mimetype' is provided, a record matches if its associated mime type matchs. Furthermore, the UTC time of the last update can be provided in three different fashions: 1) Providing only updateFrom returns all records updated at or after the provided date, 2) Providing only updateUntil returns all records updated before or at the provided date, 3) Providing both returns all records updated within the provided date range. If no parameters are provided, all accessible records are listed. With regard to schema versions, only the most recent version of each schema is listed.","operationId":"getRecords","parameters":[{"name":"schemaId","in":"query","description":"SchemaId","required":false,"schema":{"type":"string"}},{"name":"mimeType","in":"query","description":"A list of mime types returned schemas are associated with.","required":false,"schema":{"type":"array","items":{"type":"string"}}},{"name":"from","in":"query","description":"The UTC time of the earliest update of a returned record.","required":false,"schema":{"type":"string","format":"date-time"}},{"name":"until","in":"query","description":"The UTC time of the latest update of a returned record.","required":false,"schema":{"type":"string","format":"date-time"}},{"name":"page","in":"query","description":"Zero-based page index (0..N)","schema":{"type":"integer","default":0}},{"name":"size","in":"query","description":"The size of the page to be returned","schema":{"type":"integer","default":20}},{"name":"sort","in":"query","description":"Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.","schema":{"type":"array","items":{"type":"string"}}}],"responses":{"200":{"description":"OK and a list of records or an empty list of no record matches.","content":{"application/hal+json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/MetadataSchemaRecord"}}}}},"401":{"description":"Unauthorized is returned if authorization in required but was not provided.","content":{"application/hal+json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/MetadataSchemaRecord"}}}}},"403":{"description":"Forbidden is returned if the caller has no sufficient privileges.","content":{"application/hal+json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/MetadataSchemaRecord"}}}}}}},"post":{"tags":["Schema Registry"],"summary":"Register a schema document and its record.","description":"This endpoint allows to register a schema document and its record. The record must contain at least an unique identifier (schemaId) and the type of the schema (type).","operationId":"createRecord","requestBody":{"content":{"multipart/form-data":{"schema":{"required":["record","schema"],"type":"object","properties":{"record":{"type":"string","description":"Json representation of the schema record.","format":"binary"},"schema":{"type":"string","description":"The metadata schema document associated with the record.","format":"binary"}}}}}},"responses":{"201":{"description":"Created is returned only if the record has been validated, persisted and the document was successfully validated and stored.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/MetadataSchemaRecord"}}}},"400":{"description":"Bad Request is returned if the provided metadata record is invalid or if the validation of the provided schema failed.","content":{"application/json":{"schema":{"type":"string"}}}},"409":{"description":"A Conflict is returned, if there is already a record for the provided schema id.","content":{"application/json":{"schema":{"type":"string"}}}},"401":{"description":"Unauthorized is returned if authorization in required but was not provided.","content":{"application/json":{"schema":{"type":"string"}}}},"403":{"description":"Forbidden is returned if the caller has no sufficient privileges.","content":{"application/json":{"schema":{"type":"string"}}}}}}},"/api/v1/schemas/{schemaId}/validate":{"post":{"tags":["Schema Registry"],"summary":"Validate a metadata document.","description":"Validate the provided metadata document using the addressed schema. If all parameters are provided, the schema is identified uniquely by schemaId and version. If the version is omitted, the most recent version of the schema is used. This endpoint returns HTTP NO_CONTENT if it succeeds. Otherwise, an error response is returned, e.g. HTTP UNPROCESSABLE_ENTITY (422) if validation fails.","operationId":"validate","parameters":[{"name":"schemaId","in":"path","description":"The record identifier or schema identifier.","required":true,"schema":{"type":"string"}},{"name":"version","in":"query","description":"The version of the record.","required":false,"schema":{"type":"integer","format":"int64"}}],"requestBody":{"content":{"multipart/form-data":{"schema":{"required":["document"],"type":"object","properties":{"document":{"type":"string","description":"The metadata file to validate against the addressed schema.","format":"binary"}}}}}},"responses":{"204":{"description":"No Content if validate succeeded.","content":{"application/hal+json":{"schema":{"type":"string"}}}},"404":{"description":"Not found is returned, if no schema for the provided schemaId and version was found.","content":{"application/hal+json":{"schema":{"type":"string"}}}},"422":{"description":"Unprocessable Entity if validation fails.","content":{"application/hal+json":{"schema":{"type":"string"}}}},"401":{"description":"Unauthorized is returned if authorization in required but was not provided.","content":{"application/hal+json":{"schema":{"type":"string"}}}},"403":{"description":"Forbidden is returned if the caller has no sufficient privileges.","content":{"application/hal+json":{"schema":{"type":"string"}}}}}}},"/api/v1/metadata":{"get":{"tags":["Metadata Repository"],"summary":"Get all records.","description":"List all records in a paginated and sorted form. The result can be refined by providing id, specific related resource id(s) and/or metadata schema id(s) valid records must match. If 'id' is provided all available versions for given 'id' will be returned and all other parameters will be ignored.If 'resourceId' and 'schemaId' are provided, a record matches if its related resource identifier AND the used metadata schema are matching. Furthermore, the UTC time of the last update can be provided in three different fashions: 1) Providing only updateFrom returns all records updated at or after the provided date, 2) Providing only updateUntil returns all records updated before or at the provided date, 3) Providing both returns all records updated within the provided date range.If no parameters are provided, all accessible records are listed. If versioning is enabled, only the most recent version is listed (except in case of 'id' is provided).","operationId":"getRecords_1","parameters":[{"name":"id","in":"query","description":"ID of the metadata document.","required":false,"schema":{"type":"string"}},{"name":"resourceId","in":"query","description":"A list of related resource identifiers.","required":false,"schema":{"type":"array","items":{"type":"string"}}},{"name":"schemaId","in":"query","description":"A list of metadata schema identifiers.","required":false,"schema":{"type":"array","items":{"type":"string"}}},{"name":"from","in":"query","description":"The UTC time of the earliest update of a returned record.","required":false,"schema":{"type":"string","format":"date-time"}},{"name":"until","in":"query","description":"The UTC time of the latest update of a returned record.","required":false,"schema":{"type":"string","format":"date-time"}},{"name":"page","in":"query","description":"Zero-based page index (0..N)","schema":{"type":"integer","default":0}},{"name":"size","in":"query","description":"The size of the page to be returned","schema":{"type":"integer","default":20}},{"name":"sort","in":"query","description":"Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.","schema":{"type":"array","items":{"type":"string"}}}],"responses":{"200":{"description":"OK and a list of records or an empty list if no record matches.","content":{"application/hal+json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/MetadataRecord"}}}}},"401":{"description":"Unauthorized is returned if authorization in required but was not provided.","content":{"application/hal+json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/MetadataRecord"}}}}},"403":{"description":"Forbidden is returned if the caller has no sufficient privileges.","content":{"application/hal+json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/MetadataRecord"}}}}}}},"post":{"tags":["Metadata Repository"],"summary":"Ingest a new metadata document and its record.","description":"This endpoint allows to create a new metadata record by providing the record metadata as JSON document as well as the actual metadata as file upload. The record metadata mainly contains the resource identifier the record is associated with as well as the identifier of the schema which can be used to validate the provided metadata document. In the current version, both parameters are required. If no schema version is given (if 'INTERNAL' referenceis used) the most recent schema version will be used.","operationId":"createRecord_1","requestBody":{"content":{"multipart/form-data":{"schema":{"required":["document","record"],"type":"object","properties":{"record":{"type":"string","description":"Json representation of the metadata record.","format":"binary"},"document":{"type":"string","description":"The metadata document associated with the record. The document must match the schema selected by the record.","format":"binary"}}}}}},"responses":{"201":{"description":"Created is returned only if the record has been validated, persisted and the document was successfully validated and stored.","content":{"application/hal+json":{"schema":{"$ref":"#/components/schemas/MetadataRecord"}}}},"400":{"description":"Bad Request is returned if the provided metadata record is invalid or if the validation using the provided schema failed.","content":{"application/hal+json":{"schema":{"type":"string"}}}},"404":{"description":"Not found is returned, if no schema for the provided schema id was found.","content":{"application/hal+json":{"schema":{"type":"string"}}}},"409":{"description":"A Conflict is returned, if there is already a record for the related resource id and the provided schema id.","content":{"application/hal+json":{"schema":{"type":"string"}}}},"401":{"description":"Unauthorized is returned if authorization in required but was not provided.","content":{"application/hal+json":{"schema":{"type":"string"}}}},"403":{"description":"Forbidden is returned if the caller has no sufficient privileges.","content":{"application/hal+json":{"schema":{"type":"string"}}}}}}},"/api/v1/metadata/{schemaId}/search":{"post":{"tags":["Metadata Repository"],"summary":"Search for metadata document/records","description":"Search for metadata document/records using the configured Elastic backend. This endpoint serves as direct proxy to the RESTful endpoint of Elastic. In the body, a query document following the Elastic query format has to be provided. Format errors are returned directly from Elastic. This endpoint also supports authentication and authorization. User information obtained via JWT is applied to the provided query as post filter to restrict only to accessible resources. If a post filter was already provided with the query it will be replaced. Furthermore, this endpoint supports pagination. 'page' and 'size' query parameters are translated into the Elastic attributes 'from' and 'size' automatically, if not already provided within the query by the caller.","operationId":"proxy","parameters":[{"name":"schemaId","in":"path","description":"Contains all schemaIds to which the records refer as comma-separated values. Regular expressions are also allowed. See https://www.elastic.co/guide/en/elasticsearch/reference/7.17/multi-index.html","required":true,"schema":{"type":"string"}},{"name":"proxy","in":"query","required":true,"schema":{"$ref":"#/components/schemas/ProxyExchangeByte[]"}},{"name":"page","in":"query","description":"Zero-based page index (0..N)","schema":{"type":"integer","default":0}},{"name":"size","in":"query","description":"The size of the page to be returned","schema":{"type":"integer","default":20}},{"name":"sort","in":"query","description":"Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.","schema":{"type":"array","items":{"type":"string"}}}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/JsonNode"}}},"required":true},"responses":{"200":{"description":"OK and the search result is returned.","content":{"application/hal+json":{"schema":{"type":"object"}}}}},"security":[{"bearer-jwt":[]}]}},"/api/v1/metadata/search":{"post":{"tags":["Metadata Repository"],"summary":"Search for metadata document/records","description":"Search for metadata document/records using the configured Elastic backend. This endpoint serves as direct proxy to the RESTful endpoint of Elastic. In the body, a query document following the Elastic query format has to be provided. Format errors are returned directly from Elastic. This endpoint also supports authentication and authorization. User information obtained via JWT is applied to the provided query as post filter to restrict only to accessible resources. If a post filter was already provided with the query it will be replaced. Furthermore, this endpoint supports pagination. 'page' and 'size' query parameters are translated into the Elastic attributes 'from' and 'size' automatically, if not already provided within the query by the caller.","operationId":"proxy_1","parameters":[{"name":"proxy","in":"query","required":true,"schema":{"$ref":"#/components/schemas/ProxyExchangeByte[]"}},{"name":"page","in":"query","description":"Zero-based page index (0..N)","schema":{"type":"integer","default":0}},{"name":"size","in":"query","description":"The size of the page to be returned","schema":{"type":"integer","default":20}},{"name":"sort","in":"query","description":"Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.","schema":{"type":"array","items":{"type":"string"}}}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/JsonNode"}}},"required":true},"responses":{"200":{"description":"OK and the search result is returned.","content":{"application/hal+json":{"schema":{"type":"object"}}}}},"security":[{"bearer-jwt":[]}]}},"/oaipmh":{"get":{"tags":["oai-pmh-controller"],"operationId":"processRequest","parameters":[{"name":"verb","in":"query","description":"OAI-PMH supported verb, e.g. GET_RECORD, IDENTIFY, LIST_IDENTIFIERS, LIST_METADATA_FORMATS, LIST_RECORDS, LIST_SETS.","required":true,"schema":{"type":"string"}},{"name":"from","in":"query","description":"OAI-PMH from date in a data format depending on the repository, e.g. yyyy-MM-dd'T'HH:mm:ss'Z'.","required":false,"schema":{"type":"string"},"example":"2017-05-10T10:41:00Z"},{"name":"until","in":"query","description":"OAI-PMH until date in a data format depending on the repository, e.g. yyyy-MM-dd'T'HH:mm:ss'Z'.","required":false,"schema":{"type":"string"},"example":"2017-05-10T10:41:00Z"},{"name":"set","in":"query","description":"OAI-PMH document set to harvest. Only available if sets are supported.","required":false,"schema":{"type":"string"}},{"name":"identifier","in":"query","description":"OAI-PMH metadata document identifier.","required":false,"schema":{"type":"string"}},{"name":"metadataPrefix","in":"query","description":"OAI-PMH metadata format prefix.","required":false,"schema":{"type":"string"}},{"name":"resumptionToken","in":"query","description":"OAI-PMH resumption token for pagination.","required":false,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK","content":{"application/hal+json":{"schema":{"type":"string"}}}}}}}},"components":{"schemas":{"AclEntry":{"type":"object","properties":{"id":{"type":"integer","format":"int64"},"sid":{"type":"string"},"permission":{"type":"string","enum":["PERMISSION_NONE","PERMISSION_READ","PERMISSION_WRITE","PERMISSION_ADMINISTRATE"]}}},"MetadataSchemaRecord":{"required":["comment","createdAt","definition","doNotSync","label","lastUpdate","mimeType","pid","schemaDocumentUri","schemaHash","schemaId","schemaVersion","type"],"type":"object","properties":{"schemaId":{"type":"string"},"pid":{"$ref":"#/components/schemas/ResourceIdentifier"},"schemaVersion":{"type":"integer","format":"int64"},"label":{"type":"string"},"definition":{"type":"string"},"comment":{"type":"string"},"mimeType":{"type":"string"},"type":{"type":"string","enum":["JSON","XML"]},"createdAt":{"type":"string","format":"date-time"},"lastUpdate":{"type":"string","format":"date-time"},"acl":{"uniqueItems":true,"type":"array","items":{"$ref":"#/components/schemas/AclEntry"}},"schemaDocumentUri":{"type":"string"},"schemaHash":{"type":"string"},"doNotSync":{"type":"boolean"}}},"ResourceIdentifier":{"required":["id","identifier","identifierType"],"type":"object","properties":{"id":{"type":"integer","format":"int64"},"identifier":{"type":"string"},"identifierType":{"type":"string","enum":["ARK","arXiv","bibcode","DOI","EAN13","EISSN","Handle","IGSN","ISBN","ISSN","ISTC","LISSN","LSID","PMID","PURL","UPC","URL","URN","w3id","INTERNAL"]}}},"MetadataRecord":{"required":["acl","createdAt","documentHash","id","lastUpdate","metadataDocumentUri","pid","recordVersion","relatedResource","schema","schemaVersion"],"type":"object","properties":{"id":{"type":"string"},"pid":{"$ref":"#/components/schemas/ResourceIdentifier"},"relatedResource":{"$ref":"#/components/schemas/ResourceIdentifier"},"createdAt":{"type":"string","format":"date-time"},"lastUpdate":{"type":"string","format":"date-time"},"schema":{"$ref":"#/components/schemas/ResourceIdentifier"},"schemaVersion":{"type":"integer","format":"int64"},"recordVersion":{"type":"integer","format":"int64"},"acl":{"uniqueItems":true,"type":"array","items":{"$ref":"#/components/schemas/AclEntry"}},"metadataDocumentUri":{"type":"string"},"documentHash":{"type":"string"}}},"JsonNode":{"type":"object"},"ProxyExchangeByte[]":{"type":"object"}}}}
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "MetaStore Microservice - RESTful API",
+    "description": "This webpage describes the RESTful interface of the KIT Data Manager MetaStore Microservice.",
+    "contact": {
+      "name": "KIT Data Manager Support",
+      "url": "https://github.com/kit-data-manager",
+      "email": "support@datamanager.kit.edu"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "2.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8040/metastore",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/api/v2/schemas/{schemaId}": {
+      "get": {
+        "tags": [
+          "Schema Registry"
+        ],
+        "summary": "Get a schema document by schema id.",
+        "description": "Obtain a single schema document identified by its schema id. Depending on a user's role, accessing a specific record may be allowed or forbidden. Furthermore, a specific version of the schema document can be returned by providing a version number as request parameter. If no version is specified, the most recent version is returned.",
+        "operationId": "getDataCiteRecordOfSchema_1_1",
+        "parameters": [
+          {
+            "name": "schemaId",
+            "in": "path",
+            "description": "The record identifier or schema identifier.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "The version of the record.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK and the schema document is returned if the record exists and the user has sufficient permission.",
+            "content": {
+              "application/vnd.datamanager.content-information+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataSchemaRecord"
+                }
+              },
+              "application/vnd.datacite.org+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataSchemaRecord"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found is returned, if no record for the provided id and version was found.",
+            "content": {
+              "application/vnd.datamanager.content-information+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentInformation"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/vnd.datamanager.content-information+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentInformation"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/vnd.datamanager.content-information+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentInformation"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Schema Registry"
+        ],
+        "summary": "Update a schema record.",
+        "description": "Apply an update to the schema record and/or schema document with the provided schema id. The update capabilities for a schema record are quite limited. An update is always related to the most recent version. Only the associated mimeType and acl can be changed.  All other fields are updated automatically or are read-only. Updating only the metadata record does not affect the version number. A new version is only created while providing a (new) schema document.",
+        "operationId": "updateRecord",
+        "parameters": [
+          {
+            "name": "schemaId",
+            "in": "path",
+            "description": "The schema id.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "ETag of the object. Please use quotation marks!",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "record": {
+                    "type": "string",
+                    "description": "Json representation of the schema record.",
+                    "format": "binary"
+                  },
+                  "schema": {
+                    "type": "string",
+                    "description": "The metadata schema document associated with the record.",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request is returned if the provided schema record/schema document is invalid."
+          },
+          "200": {
+            "description": "OK is returned in case of a successful update. The updated record is returned in the response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataSchemaRecord"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found is returned if no record for the provided id was found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResource"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResource"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResource"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Schema Registry"
+        ],
+        "summary": "Delete a schema record.",
+        "description": "Delete a single schema record. Deleting a record typically requires the caller to have special permissions. In some cases, deleting a record can also be available for the owner or other privileged users or can be forbidden at all. Deletion of a record affects all versions of the particular record.",
+        "operationId": "deleteRecord",
+        "parameters": [
+          {
+            "name": "schemaId",
+            "in": "path",
+            "description": "The schema id.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "ETag of the object. Please use quotation marks!",
+            "required": true
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content is returned as long as no error occurs while deleting a record. Multiple delete operations to the same record will also return HTTP 204 even if the deletion succeeded in the first call.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/metadata/{id}": {
+      "get": {
+        "tags": [
+          "Metadata Repository"
+        ],
+        "summary": "Get a metadata record by id.",
+        "description": "Obtain a single record by its resource identifier. Depending on a user's role, accessing a specific record may be allowed or forbidden. Furthermore, a specific version of the record can be returned by providing a version number as request parameter.",
+        "operationId": "getMetadataDocumentById_1_1_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The record identifier or related resource identifier.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "The version of the record. This parameter only has an effect if versioning  is enabled.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK and the record is returned if the record exists and the user has sufficient permission.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/vnd.datamanager.content-information+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResource"
+                }
+              },
+              "application/vnd.datamanager.acl+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResource"
+                }
+              },
+              "application/vnd.datacite.org+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResource"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found is returned, if no record for the provided id or version was found.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Metadata Repository"
+        ],
+        "summary": "Update a metadata record and/or metadata document.",
+        "description": "Apply an update to the metadata record with the provided resource identifier and/or its accociated metadata document.If versioning is enabled and a (new) metadata document is provided, a new version of the record is created. Otherwise, the record and/or its metadata document are overwritten.",
+        "operationId": "updateRecord_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The resource identifier.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "ETag of the object. Please use quotation marks!",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "record": {
+                    "type": "string",
+                    "description": "JSON representation of the metadata record.",
+                    "format": "binary"
+                  },
+                  "document": {
+                    "type": "string",
+                    "description": "The metadata document associated with the record. The document must match the schema defined in the record.",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request is returned if the provided metadata record is invalid or if the validation using the provided schema failed."
+          },
+          "200": {
+            "description": "OK is returned in case of a successful update, e.g. the record (if provided) was in the correct format and the document (if provided) matches the provided schema id.The updated record is returned in the response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResource"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found is returned if no record for the provided id or no schema for the provided schema id was found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Metadata Repository"
+        ],
+        "summary": "Delete a record.",
+        "description": "Delete a single metadata record and the associated metadata document linked with the provided resource identifier. Deleting a record typically requires the caller to have special permissions. In some cases, deleting a record can also be available for the owner or other privileged users or can be forbidden at all. Deletion of a record affects all versions of the particular record.",
+        "operationId": "deleteRecord_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The resource identifier.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "ETag of the object. Please use quotation marks!",
+            "required": true
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content is returned as long as no error occurs while deleting a record. Multiple delete operations to the same record will also return HTTP 204 even if the deletion succeeded in the first call.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/schemas/{schemaId}": {
+      "get": {
+        "tags": [
+          "Schema Registry"
+        ],
+        "summary": "Get schema record by schema id (and version).",
+        "description": "Obtain is single schema record by its schema id. Depending on a user's role, accessing a specific record may be allowed or forbidden. Furthermore, a specific version of the record can be returned by providing a version number as request parameter. If no version is specified, the most recent version is returned.",
+        "operationId": "getSchemaDocumentById_1",
+        "parameters": [
+          {
+            "name": "schemaId",
+            "in": "path",
+            "description": "The schema id.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "The version of the record.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK and the record is returned if the record exists and the user has sufficient permission.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/vnd.datamanager.schema-record+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataSchemaRecord"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found is returned, if no record for the provided id and version was found.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      },
+      "put": {
+        "tags": [
+          "Schema Registry"
+        ],
+        "summary": "Update a schema record.",
+        "description": "Apply an update to the schema record and/or schema document with the provided schema id. The update capabilities for a schema record are quite limited. An update is always related to the most recent version. Only the associated mimeType and acl can be changed.  All other fields are updated automatically or are read-only. Updating only the metadata record does not affect the version number. A new version is only created while providing a (new) schema document.",
+        "operationId": "updateRecord_2",
+        "parameters": [
+          {
+            "name": "schemaId",
+            "in": "path",
+            "description": "The schema id.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "ETag of the object. Please use quotation marks!",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "record": {
+                    "type": "string",
+                    "description": "Json representation of the schema record.",
+                    "format": "binary"
+                  },
+                  "schema": {
+                    "type": "string",
+                    "description": "The metadata schema document associated with the record.",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request is returned if the provided schema record/schema document is invalid."
+          },
+          "200": {
+            "description": "OK is returned in case of a successful update. The updated record is returned in the response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataSchemaRecord"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found is returned if no record for the provided id was found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      },
+      "delete": {
+        "tags": [
+          "Schema Registry"
+        ],
+        "summary": "Delete a schema record.",
+        "description": "Delete a single schema record. Deleting a record typically requires the caller to have special permissions. In some cases, deleting a record can also be available for the owner or other privileged users or can be forbidden at all. Deletion of a record affects all versions of the particular record.",
+        "operationId": "deleteRecord_2",
+        "parameters": [
+          {
+            "name": "schemaId",
+            "in": "path",
+            "description": "The schema id.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "ETag of the object. Please use quotation marks!",
+            "required": true
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content is returned as long as no error occurs while deleting a record. Multiple delete operations to the same record will also return HTTP 204 even if the deletion succeeded in the first call.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/v1/metadata/{id}": {
+      "get": {
+        "tags": [
+          "Metadata Repository"
+        ],
+        "summary": "Get a metadata record by id.",
+        "description": "Obtain a single record by its resource identifier. Depending on a user's role, accessing a specific record may be allowed or forbidden. Furthermore, a specific version of the record can be returned by providing a version number as request parameter.",
+        "operationId": "getMetadataDocumentById_1_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The record identifier or related resource identifier.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "The version of the record. This parameter only has an effect if versioning  is enabled.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK and the record is returned if the record exists and the user has sufficient permission.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/vnd.datamanager.metadata-record+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataRecord"
+                }
+              },
+              "application/vnd.datamanager.acl+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataRecord"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found is returned, if no record for the provided id or version was found.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      },
+      "put": {
+        "tags": [
+          "Metadata Repository"
+        ],
+        "summary": "Update a metadata record and/or metadata document.",
+        "description": "Apply an update to the metadata record with the provided resource identifier and/or its accociated metadata document.If versioning is enabled and a (new) metadata document is provided, a new version of the record is created. Otherwise, the record and/or its metadata document are overwritten.",
+        "operationId": "updateRecord_3",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The resource identifier.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "ETag of the object. Please use quotation marks!",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "record": {
+                    "type": "string",
+                    "description": "JSON representation of the metadata record.",
+                    "format": "binary"
+                  },
+                  "document": {
+                    "type": "string",
+                    "description": "The metadata document associated with the record. The document must match the schema defined in the record.",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request is returned if the provided metadata record is invalid or if the validation using the provided schema failed."
+          },
+          "200": {
+            "description": "OK is returned in case of a successful update, e.g. the record (if provided) was in the correct format and the document (if provided) matches the provided schema id.The updated record is returned in the response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataRecord"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found is returned if no record for the provided id or no schema for the provided schema id was found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      },
+      "delete": {
+        "tags": [
+          "Metadata Repository"
+        ],
+        "summary": "Delete a record.",
+        "description": "Delete a single metadata record and the associated metadata document linked with the provided resource identifier. Deleting a record typically requires the caller to have special permissions. In some cases, deleting a record can also be available for the owner or other privileged users or can be forbidden at all. Deletion of a record affects all versions of the particular record.",
+        "operationId": "deleteRecord_3",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The resource identifier.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "ETag of the object. Please use quotation marks!",
+            "required": true
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content is returned as long as no error occurs while deleting a record. Multiple delete operations to the same record will also return HTTP 204 even if the deletion succeeded in the first call.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/v2/schemas/{schemaId}/validate": {
+      "post": {
+        "tags": [
+          "Schema Registry"
+        ],
+        "summary": "Validate a metadata document.",
+        "description": "Validate the provided metadata document using the addressed schema. If all parameters are provided, the schema is identified uniquely by schemaId and version. If the version is omitted, the most recent version of the schema is used. This endpoint returns HTTP NO_CONTENT if it succeeds. Otherwise, an error response is returned, e.g. HTTP UNPROCESSABLE_ENTITY (422) if validation fails.",
+        "operationId": "validate",
+        "parameters": [
+          {
+            "name": "schemaId",
+            "in": "path",
+            "description": "The record identifier or schema identifier.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "The version of the record.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "document"
+                ],
+                "type": "object",
+                "properties": {
+                  "document": {
+                    "type": "string",
+                    "description": "The metadata file to validate against the addressed schema.",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content if validate succeeded.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found is returned, if no schema for the provided schemaId and version was found.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity if validation fails.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/schemas/": {
+      "get": {
+        "tags": [
+          "Schema Registry"
+        ],
+        "summary": "Get all schema records.",
+        "description": "List all schema records in a paginated and/or sorted form. The result can be refined by providing schemaId, a list of one or more mimetypes and/or a date range. Returned schema record(s) must match. if 'schemaId' is provided all other parameters were skipped and all versions of the given schemaId record will be returned. If 'mimetype' is provided, a record matches if its associated mime type matchs. Furthermore, the UTC time of the last update can be provided in three different fashions: 1) Providing only updateFrom returns all records updated at or after the provided date, 2) Providing only updateUntil returns all records updated before or at the provided date, 3) Providing both returns all records updated within the provided date range. If no parameters are provided, all accessible records are listed. With regard to schema versions, only the most recent version of each schema is listed.",
+        "operationId": "getRecords",
+        "parameters": [
+          {
+            "name": "schemaId",
+            "in": "query",
+            "description": "SchemaId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mimeType",
+            "in": "query",
+            "description": "A list of mime types returned schemas are associated with.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "The UTC time of the earliest update of a returned record.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "description": "The UTC time of the latest update of a returned record.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK and a list of records or an empty list of no record matches.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetadataSchemaRecord"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DataResource"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DataResource"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Schema Registry"
+        ],
+        "summary": "Register a schema document and its record.",
+        "description": "This endpoint allows to register a schema document and its (datacite) record. The record must contain at least an unique identifier (schemaId) and the type of the schema (type).",
+        "operationId": "createSchema",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "record",
+                  "schema"
+                ],
+                "type": "object",
+                "properties": {
+                  "record": {
+                    "type": "string",
+                    "description": "Json representation of the schema record.",
+                    "format": "binary"
+                  },
+                  "schema": {
+                    "type": "string",
+                    "description": "The metadata schema document associated with the record.",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request is returned if the provided metadata record is invalid or if the validation of the provided schema failed."
+          },
+          "201": {
+            "description": "Created is returned only if the record has been validated, persisted and the document was successfully validated and stored.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataSchemaRecord"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A Conflict is returned, if there is already a record for the provided schema id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResource"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResource"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResource"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/metadata/{schemaId}/search": {
+      "post": {
+        "tags": [
+          "Metadata Repository"
+        ],
+        "summary": "Search for metadata document/records",
+        "description": "Search for metadata document/records using the configured Elastic backend. This endpoint serves as direct proxy to the RESTful endpoint of Elastic. In the body, a query document following the Elastic query format has to be provided. Format errors are returned directly from Elastic. This endpoint also supports authentication and authorization. User information obtained via JWT is applied to the provided query as post filter to restrict only to accessible resources. If a post filter was already provided with the query it will be replaced. Furthermore, this endpoint supports pagination. 'page' and 'size' query parameters are translated into the Elastic attributes 'from' and 'size' automatically, if not already provided within the query by the caller.",
+        "operationId": "proxy",
+        "parameters": [
+          {
+            "name": "schemaId",
+            "in": "path",
+            "description": "Contains all schemaIds to which the records refer as comma-separated values. Regular expressions are also allowed. See https://www.elastic.co/guide/en/elasticsearch/reference/7.17/multi-index.html",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "proxy",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ProxyExchangeJsonNode"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK and the search result is returned.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-jwt": []
+          }
+        ]
+      }
+    },
+    "/api/v2/metadata/search": {
+      "post": {
+        "tags": [
+          "Metadata Repository"
+        ],
+        "summary": "Search for metadata document/records",
+        "description": "Search for metadata document/records using the configured Elastic backend. This endpoint serves as direct proxy to the RESTful endpoint of Elastic. In the body, a query document following the Elastic query format has to be provided. Format errors are returned directly from Elastic. This endpoint also supports authentication and authorization. User information obtained via JWT is applied to the provided query as post filter to restrict only to accessible resources. If a post filter was already provided with the query it will be replaced. Furthermore, this endpoint supports pagination. 'page' and 'size' query parameters are translated into the Elastic attributes 'from' and 'size' automatically, if not already provided within the query by the caller.",
+        "operationId": "proxy_1",
+        "parameters": [
+          {
+            "name": "proxy",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ProxyExchangeJsonNode"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK and the search result is returned.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer-jwt": []
+          }
+        ]
+      }
+    },
+    "/api/v2/metadata/": {
+      "get": {
+        "tags": [
+          "Metadata Repository"
+        ],
+        "summary": "Get all records.",
+        "description": "List all records in a paginated and sorted form. The result can be refined by providing id, specific related resource id(s) and/or metadata schema id(s) valid records must match. If 'id' is provided all available versions for given 'id' will be returned and all other parameters will be ignored.If 'resourceId' and 'schemaId' are provided, a record matches if its related resource identifier AND the used metadata schema are matching. Furthermore, the UTC time of the last update can be provided in three different fashions: 1) Providing only updateFrom returns all records updated at or after the provided date, 2) Providing only updateUntil returns all records updated before or at the provided date, 3) Providing both returns all records updated within the provided date range.If no parameters are provided, all accessible records are listed. If versioning is enabled, only the most recent version is listed (except in case of 'id' is provided).",
+        "operationId": "getRecords_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "ID of the metadata document.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "resourceId",
+            "in": "query",
+            "description": "A list of related resource identifiers.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "schemaId",
+            "in": "query",
+            "description": "A list of metadata schema identifiers.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "The UTC time of the earliest update of a returned record.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "description": "The UTC time of the latest update of a returned record.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK and a list of records or an empty list if no record matches.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DataResource"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DataResource"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DataResource"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Metadata Repository"
+        ],
+        "summary": "Ingest a new metadata document and its record.",
+        "description": "This endpoint allows to create a new metadata record by providing the record metadata as JSON document as well as the actual metadata as file upload. The record metadata mainly contains the resource identifier the record is associated with as well as the identifier of the schema which can be used to validate the provided metadata document. In the current version, both parameters are required. If no schema version is given (if 'INTERNAL' referenceis used) the most recent schema version will be used.",
+        "operationId": "createRecord",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "document",
+                  "record"
+                ],
+                "type": "object",
+                "properties": {
+                  "record": {
+                    "type": "string",
+                    "description": "Json representation of the datacite record.",
+                    "format": "binary"
+                  },
+                  "document": {
+                    "type": "string",
+                    "description": "The metadata document associated with the record. The document must match the schema selected by the record.",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request is returned if the provided metadata record is invalid or if the validation using the provided schema failed."
+          },
+          "201": {
+            "description": "Created is returned only if the record has been validated, persisted and the document was successfully validated and stored.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResource"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found is returned, if no schema for the provided schema id was found.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A Conflict is returned, if there is already a record for the related resource id and the provided schema id.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/schemas/{schemaId}/validate": {
+      "post": {
+        "tags": [
+          "Schema Registry"
+        ],
+        "summary": "Validate a metadata document.",
+        "description": "Validate the provided metadata document using the addressed schema. If all parameters are provided, the schema is identified uniquely by schemaId and version. If the version is omitted, the most recent version of the schema is used. This endpoint returns HTTP NO_CONTENT if it succeeds. Otherwise, an error response is returned, e.g. HTTP UNPROCESSABLE_ENTITY (422) if validation fails.",
+        "operationId": "validate_1",
+        "parameters": [
+          {
+            "name": "schemaId",
+            "in": "path",
+            "description": "The record identifier or schema identifier.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "The version of the record.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "document"
+                ],
+                "type": "object",
+                "properties": {
+                  "document": {
+                    "type": "string",
+                    "description": "The metadata file to validate against the addressed schema.",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content if validate succeeded.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found is returned, if no schema for the provided schemaId and version was found.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity if validation fails.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/v1/schemas": {
+      "get": {
+        "tags": [
+          "Schema Registry"
+        ],
+        "summary": "Get all schema records.",
+        "description": "List all schema records in a paginated and/or sorted form. The result can be refined by providing schemaId, a list of one or more mimetypes and/or a date range. Returned schema record(s) must match. if 'schemaId' is provided all other parameters were skipped and all versions of the given schemaId record will be returned. If 'mimetype' is provided, a record matches if its associated mime type matchs. Furthermore, the UTC time of the last update can be provided in three different fashions: 1) Providing only updateFrom returns all records updated at or after the provided date, 2) Providing only updateUntil returns all records updated before or at the provided date, 3) Providing both returns all records updated within the provided date range. If no parameters are provided, all accessible records are listed. With regard to schema versions, only the most recent version of each schema is listed.",
+        "operationId": "getRecords_2",
+        "parameters": [
+          {
+            "name": "schemaId",
+            "in": "query",
+            "description": "SchemaId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mimeType",
+            "in": "query",
+            "description": "A list of mime types returned schemas are associated with.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "The UTC time of the earliest update of a returned record.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "description": "The UTC time of the latest update of a returned record.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK and a list of records or an empty list of no record matches.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetadataSchemaRecord"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetadataSchemaRecord"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetadataSchemaRecord"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      },
+      "post": {
+        "tags": [
+          "Schema Registry"
+        ],
+        "summary": "Register a schema document and its record.",
+        "description": "This endpoint allows to register a schema document and its record. The record must contain at least an unique identifier (schemaId) and the type of the schema (type).",
+        "operationId": "createRecord_1",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "record",
+                  "schema"
+                ],
+                "type": "object",
+                "properties": {
+                  "record": {
+                    "type": "string",
+                    "description": "Json representation of the schema record.",
+                    "format": "binary"
+                  },
+                  "schema": {
+                    "type": "string",
+                    "description": "The metadata schema document associated with the record.",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request is returned if the provided metadata record is invalid or if the validation of the provided schema failed."
+          },
+          "201": {
+            "description": "Created is returned only if the record has been validated, persisted and the document was successfully validated and stored.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataSchemaRecord"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A Conflict is returned, if there is already a record for the provided schema id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/v1/schemas/": {
+      "get": {
+        "tags": [
+          "Schema Registry"
+        ],
+        "summary": "Get all schema records.",
+        "description": "List all schema records in a paginated and/or sorted form. The result can be refined by providing schemaId, a list of one or more mimetypes and/or a date range. Returned schema record(s) must match. if 'schemaId' is provided all other parameters were skipped and all versions of the given schemaId record will be returned. If 'mimetype' is provided, a record matches if its associated mime type matchs. Furthermore, the UTC time of the last update can be provided in three different fashions: 1) Providing only updateFrom returns all records updated at or after the provided date, 2) Providing only updateUntil returns all records updated before or at the provided date, 3) Providing both returns all records updated within the provided date range. If no parameters are provided, all accessible records are listed. With regard to schema versions, only the most recent version of each schema is listed.",
+        "operationId": "getRecords_3",
+        "parameters": [
+          {
+            "name": "schemaId",
+            "in": "query",
+            "description": "SchemaId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mimeType",
+            "in": "query",
+            "description": "A list of mime types returned schemas are associated with.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "The UTC time of the earliest update of a returned record.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "description": "The UTC time of the latest update of a returned record.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK and a list of records or an empty list of no record matches.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetadataSchemaRecord"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetadataSchemaRecord"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetadataSchemaRecord"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      },
+      "post": {
+        "tags": [
+          "Schema Registry"
+        ],
+        "summary": "Register a schema document and its record.",
+        "description": "This endpoint allows to register a schema document and its record. The record must contain at least an unique identifier (schemaId) and the type of the schema (type).",
+        "operationId": "createRecord_2",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "record",
+                  "schema"
+                ],
+                "type": "object",
+                "properties": {
+                  "record": {
+                    "type": "string",
+                    "description": "Json representation of the schema record.",
+                    "format": "binary"
+                  },
+                  "schema": {
+                    "type": "string",
+                    "description": "The metadata schema document associated with the record.",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request is returned if the provided metadata record is invalid or if the validation of the provided schema failed."
+          },
+          "201": {
+            "description": "Created is returned only if the record has been validated, persisted and the document was successfully validated and stored.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataSchemaRecord"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A Conflict is returned, if there is already a record for the provided schema id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/v1/metadata/{schemaId}/search": {
+      "post": {
+        "tags": [
+          "Metadata Repository"
+        ],
+        "summary": "Search for metadata document/records",
+        "description": "Use '/api/v1/{index}/_search' instead!Search for metadata document/records using the configured Elastic backend. This endpoint serves as direct proxy to the RESTful endpoint of Elastic. In the body, a query document following the Elastic query format has to be provided. Format errors are returned directly from Elastic. This endpoint also supports authentication and authorization. User information obtained via JWT is applied to the provided query as post filter to restrict only to accessible resources. If a post filter was already provided with the query it will be replaced. Furthermore, this endpoint supports pagination. 'page' and 'size' query parameters are translated into the Elastic attributes 'from' and 'size' automatically, if not already provided within the query by the caller.",
+        "operationId": "proxy_2",
+        "parameters": [
+          {
+            "name": "schemaId",
+            "in": "path",
+            "description": "Contains all schemaIds prefixed with 'metastore-'to which the records refer as comma-separated values. Regular expressions are also allowed. See https://www.elastic.co/guide/en/elasticsearch/reference/7.17/multi-index.html",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "proxy",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ProxyExchangeJsonNode"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK and the search result is returned.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true,
+        "security": [
+          {
+            "bearer-jwt": []
+          }
+        ]
+      }
+    },
+    "/api/v1/metadata/search": {
+      "post": {
+        "tags": [
+          "Metadata Repository"
+        ],
+        "summary": "Search for metadata document/records",
+        "description": "Use '/api/v1/{index}/_search' instead!Search for metadata document/records using the configured Elastic backend. This endpoint serves as direct proxy to the RESTful endpoint of Elastic. In the body, a query document following the Elastic query format has to be provided. Format errors are returned directly from Elastic. This endpoint also supports authentication and authorization. User information obtained via JWT is applied to the provided query as post filter to restrict only to accessible resources. If a post filter was already provided with the query it will be replaced. Furthermore, this endpoint supports pagination. 'page' and 'size' query parameters are translated into the Elastic attributes 'from' and 'size' automatically, if not already provided within the query by the caller.",
+        "operationId": "proxy_3",
+        "parameters": [
+          {
+            "name": "proxy",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ProxyExchangeJsonNode"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK and the search result is returned.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true,
+        "security": [
+          {
+            "bearer-jwt": []
+          }
+        ]
+      }
+    },
+    "/api/v1/metadata": {
+      "get": {
+        "tags": [
+          "Metadata Repository"
+        ],
+        "summary": "Get all records.",
+        "description": "List all records in a paginated and sorted form. The result can be refined by providing id, specific related resource id(s) and/or metadata schema id(s) valid records must match. If 'id' is provided all available versions for given 'id' will be returned and all other parameters will be ignored.If 'resourceId' and 'schemaId' are provided, a record matches if its related resource identifier AND the used metadata schema are matching. Furthermore, the UTC time of the last update can be provided in three different fashions: 1) Providing only updateFrom returns all records updated at or after the provided date, 2) Providing only updateUntil returns all records updated before or at the provided date, 3) Providing both returns all records updated within the provided date range.If no parameters are provided, all accessible records are listed. If versioning is enabled, only the most recent version is listed (except in case of 'id' is provided).",
+        "operationId": "getRecords_4",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "ID of the metadata document.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "resourceId",
+            "in": "query",
+            "description": "A list of related resource identifiers.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "schemaId",
+            "in": "query",
+            "description": "A list of metadata schema identifiers.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "The UTC time of the earliest update of a returned record.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "description": "The UTC time of the latest update of a returned record.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK and a list of records or an empty list if no record matches.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetadataRecord"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetadataRecord"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetadataRecord"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      },
+      "post": {
+        "tags": [
+          "Metadata Repository"
+        ],
+        "summary": "Ingest a new metadata document and its record.",
+        "description": "This endpoint allows to create a new metadata record by providing the record metadata as JSON document as well as the actual metadata as file upload. The record metadata mainly contains the resource identifier the record is associated with as well as the identifier of the schema which can be used to validate the provided metadata document. In the current version, both parameters are required. If no schema version is given (if 'INTERNAL' referenceis used) the most recent schema version will be used.",
+        "operationId": "createRecord_3",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "document",
+                  "record"
+                ],
+                "type": "object",
+                "properties": {
+                  "record": {
+                    "type": "string",
+                    "description": "Json representation of the metadata record.",
+                    "format": "binary"
+                  },
+                  "document": {
+                    "type": "string",
+                    "description": "The metadata document associated with the record. The document must match the schema selected by the record.",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request is returned if the provided metadata record is invalid or if the validation using the provided schema failed."
+          },
+          "201": {
+            "description": "Created is returned only if the record has been validated, persisted and the document was successfully validated and stored.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataRecord"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found is returned, if no schema for the provided schema id was found.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A Conflict is returned, if there is already a record for the related resource id and the provided schema id.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/v1/metadata/": {
+      "get": {
+        "tags": [
+          "Metadata Repository"
+        ],
+        "summary": "Get all records.",
+        "description": "List all records in a paginated and sorted form. The result can be refined by providing id, specific related resource id(s) and/or metadata schema id(s) valid records must match. If 'id' is provided all available versions for given 'id' will be returned and all other parameters will be ignored.If 'resourceId' and 'schemaId' are provided, a record matches if its related resource identifier AND the used metadata schema are matching. Furthermore, the UTC time of the last update can be provided in three different fashions: 1) Providing only updateFrom returns all records updated at or after the provided date, 2) Providing only updateUntil returns all records updated before or at the provided date, 3) Providing both returns all records updated within the provided date range.If no parameters are provided, all accessible records are listed. If versioning is enabled, only the most recent version is listed (except in case of 'id' is provided).",
+        "operationId": "getRecords_5",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "ID of the metadata document.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "resourceId",
+            "in": "query",
+            "description": "A list of related resource identifiers.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "schemaId",
+            "in": "query",
+            "description": "A list of metadata schema identifiers.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "The UTC time of the earliest update of a returned record.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "description": "The UTC time of the latest update of a returned record.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK and a list of records or an empty list if no record matches.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetadataRecord"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetadataRecord"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetadataRecord"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      },
+      "post": {
+        "tags": [
+          "Metadata Repository"
+        ],
+        "summary": "Ingest a new metadata document and its record.",
+        "description": "This endpoint allows to create a new metadata record by providing the record metadata as JSON document as well as the actual metadata as file upload. The record metadata mainly contains the resource identifier the record is associated with as well as the identifier of the schema which can be used to validate the provided metadata document. In the current version, both parameters are required. If no schema version is given (if 'INTERNAL' referenceis used) the most recent schema version will be used.",
+        "operationId": "createRecord_4",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "document",
+                  "record"
+                ],
+                "type": "object",
+                "properties": {
+                  "record": {
+                    "type": "string",
+                    "description": "Json representation of the metadata record.",
+                    "format": "binary"
+                  },
+                  "document": {
+                    "type": "string",
+                    "description": "The metadata document associated with the record. The document must match the schema selected by the record.",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request is returned if the provided metadata record is invalid or if the validation using the provided schema failed."
+          },
+          "201": {
+            "description": "Created is returned only if the record has been validated, persisted and the document was successfully validated and stored.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataRecord"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found is returned, if no schema for the provided schema id was found.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A Conflict is returned, if there is already a record for the related resource id and the provided schema id.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization in required but was not provided.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/schema-landing-page": {
+      "get": {
+        "tags": [
+          "Landing Page"
+        ],
+        "summary": "Get landing page of schema by schema id (and version).",
+        "description": "Show landing page by its schema id. Depending on a user's role, accessing a specific record may be allowed or forbidden. Furthermore, a specific version of the schema can be returned by providing a version number as request parameter. If no version is specified, all versions will be returned.",
+        "operationId": "getLandingPageOfSchemaWithId",
+        "parameters": [
+          {
+            "name": "schemaId",
+            "in": "query",
+            "description": "The record identifier or schema identifier.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "The version of the record.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK and the landingpage is returned if the id exists and the user has sufficient permission.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataSchemaRecord"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found is returned, if no record for the provided id and version was found.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization is required but was not provided.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/schema-landing-page-v2": {
+      "get": {
+        "tags": [
+          "Landing Page"
+        ],
+        "summary": "Get landing page of schema by schema id (and version).",
+        "description": "Show landing page by its schema id. Depending on a user's role, accessing a specific record may be allowed or forbidden. Furthermore, a specific version of the schema can be returned by providing a version number as request parameter. If no version is specified, all versions will be returned.",
+        "operationId": "getLandingPageOfSchemaWithId_1",
+        "parameters": [
+          {
+            "name": "schemaId",
+            "in": "query",
+            "description": "The record identifier or schema identifier.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "The version of the record.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK and the landingpage is returned if the id exists and the user has sufficient permission.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataSchemaRecord"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found is returned, if no record for the provided id and version was found.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization is required but was not provided.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oaipmh": {
+      "get": {
+        "tags": [
+          "oai-pmh-controller"
+        ],
+        "operationId": "processRequest",
+        "parameters": [
+          {
+            "name": "verb",
+            "in": "query",
+            "description": "OAI-PMH supported verb, e.g. GET_RECORD, IDENTIFY, LIST_IDENTIFIERS, LIST_METADATA_FORMATS, LIST_RECORDS, LIST_SETS.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "OAI-PMH from date in a data format depending on the repository, e.g. yyyy-MM-dd'T'HH:mm:ss'Z'.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "2017-05-10T10:41:00Z"
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "description": "OAI-PMH until date in a data format depending on the repository, e.g. yyyy-MM-dd'T'HH:mm:ss'Z'.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "2017-05-10T10:41:00Z"
+          },
+          {
+            "name": "set",
+            "in": "query",
+            "description": "OAI-PMH document set to harvest. Only available if sets are supported.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "identifier",
+            "in": "query",
+            "description": "OAI-PMH metadata document identifier.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "metadataPrefix",
+            "in": "query",
+            "description": "OAI-PMH metadata format prefix.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "resumptionToken",
+            "in": "query",
+            "description": "OAI-PMH resumption token for pagination.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/metadata-landing-page": {
+      "get": {
+        "tags": [
+          "Landing Page"
+        ],
+        "summary": "Get a landing page by id.",
+        "description": "Obtain a single record by its resource identifier. Depending on a user's role, accessing a specific record may be allowed or forbidden. Furthermore, a specific version of the record can be returned by providing a version number as request parameter.",
+        "operationId": "getLandingPageOfMetadataDocumentWithId",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The identifier of the metadata document.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "The version of the digital object. This parameter only has an effect if versioning  is enabled.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK and the record is returned if the record exists and the user has sufficient permission.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataRecord"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found is returned, if no record for the provided id or version was found.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization is required but was not provided.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/metadata-landing-page-v2": {
+      "get": {
+        "tags": [
+          "Landing Page"
+        ],
+        "summary": "Get a landing page by id.",
+        "description": "Obtain a single record by its resource identifier. Depending on a user's role, accessing a specific record may be allowed or forbidden. Furthermore, a specific version of the record can be returned by providing a version number as request parameter.",
+        "operationId": "getLandingPageOfMetadataDocumentWithId_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The identifier of the metadata document.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "The version of the digital object. This parameter only has an effect if versioning  is enabled.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK and the record is returned if the record exists and the user has sufficient permission.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataRecord"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found is returned, if no record for the provided id or version was found.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized is returned if authorization is required but was not provided.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden is returned if the caller has no sufficient privileges.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AclEntry": {
+        "required": [
+          "sid"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sid": {
+            "type": "string"
+          },
+          "permission": {
+            "type": "string",
+            "enum": [
+              "PERMISSION_NONE",
+              "PERMISSION_READ",
+              "PERMISSION_WRITE",
+              "PERMISSION_ADMINISTRATE"
+            ]
+          }
+        }
+      },
+      "MetadataSchemaRecord": {
+        "required": [
+          "comment",
+          "createdAt",
+          "definition",
+          "doNotSync",
+          "label",
+          "lastUpdate",
+          "licenseUri",
+          "mimeType",
+          "pid",
+          "schemaDocumentUri",
+          "schemaHash",
+          "schemaId",
+          "schemaVersion",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "schemaId": {
+            "type": "string"
+          },
+          "pid": {
+            "$ref": "#/components/schemas/ResourceIdentifier"
+          },
+          "schemaVersion": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "label": {
+            "type": "string"
+          },
+          "definition": {
+            "type": "string"
+          },
+          "comment": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "JSON",
+              "XML"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastUpdate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "acl": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AclEntry"
+            }
+          },
+          "licenseUri": {
+            "type": "string"
+          },
+          "schemaDocumentUri": {
+            "type": "string"
+          },
+          "schemaHash": {
+            "type": "string"
+          },
+          "doNotSync": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ResourceIdentifier": {
+        "required": [
+          "id",
+          "identifier",
+          "identifierType"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "identifier": {
+            "type": "string"
+          },
+          "identifierType": {
+            "type": "string",
+            "enum": [
+              "ARK",
+              "arXiv",
+              "bibcode",
+              "DOI",
+              "EAN13",
+              "EISSN",
+              "Handle",
+              "IGSN",
+              "ISBN",
+              "ISSN",
+              "ISTC",
+              "LISSN",
+              "LSID",
+              "PMID",
+              "PURL",
+              "UPC",
+              "URL",
+              "URN",
+              "w3id",
+              "INTERNAL"
+            ]
+          }
+        }
+      },
+      "Agent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "familyName": {
+            "type": "string",
+            "description": "Family name of the user.",
+            "example": "Doe"
+          },
+          "givenName": {
+            "type": "string",
+            "description": "Given name of the user.",
+            "example": "John"
+          },
+          "affiliations": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Affiliation of the user, e.g. home institution.",
+            "example": "Karlsruhe Institute of Techology",
+            "items": {
+              "type": "string",
+              "description": "Affiliation of the user, e.g. home institution.",
+              "example": "Karlsruhe Institute of Techology"
+            }
+          }
+        },
+        "description": "An agent related to the creation or modification of a resource, e.g. the creator or a contributor."
+      },
+      "Box": {
+        "required": [
+          "eastLongitude",
+          "northLatitude",
+          "southLatitude",
+          "westLongitude"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "westLongitude": {
+            "type": "number",
+            "description": "-67.302",
+            "format": "float"
+          },
+          "eastLongitude": {
+            "type": "number",
+            "description": "-67.302",
+            "format": "float"
+          },
+          "southLatitude": {
+            "type": "number",
+            "description": "31.233",
+            "format": "float"
+          },
+          "northLatitude": {
+            "type": "number",
+            "description": "31.233",
+            "format": "float"
+          }
+        },
+        "description": "Geo location information as box."
+      },
+      "Contributor": {
+        "required": [
+          "contributionType",
+          "user"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "user": {
+            "$ref": "#/components/schemas/Agent"
+          },
+          "contributionType": {
+            "type": "string",
+            "description": "Controlled vocabulary value describing the contribution type, e.g. Producer.",
+            "enum": [
+              "CONTACT_PERSON",
+              "DATA_COLLECTOR",
+              "DATA_CURATOR",
+              "DATA_MANAGER",
+              "DISTRIBUTOR",
+              "EDITOR",
+              "HOSTING_INSTITUTION",
+              "OTHER",
+              "PRODUCER",
+              "PROJECT_LEADER",
+              "PROJECT_MANAGER",
+              "PROJECT_MEMBER",
+              "REGISTRATION_AGENCY",
+              "REGISTRATION_AUTHORITY",
+              "RELATED_PERSON",
+              "RESEARCH_GROUP",
+              "RIGHTS_HOLDER",
+              "RESEARCHER",
+              "SPONSOR",
+              "SUPERVISOR",
+              "WORK_PACKAGE_LEADER"
+            ]
+          }
+        },
+        "description": "A contributor to a resource."
+      },
+      "DataResource": {
+        "required": [
+          "creators",
+          "embargoDate",
+          "identifier",
+          "lastUpdate",
+          "publicationYear",
+          "publisher",
+          "resourceType",
+          "titles"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "readOnly": true
+          },
+          "identifier": {
+            "$ref": "#/components/schemas/PrimaryIdentifier"
+          },
+          "creators": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Agent"
+            }
+          },
+          "titles": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Title"
+            }
+          },
+          "publisher": {
+            "type": "string",
+            "description": "Publisher, e.g. institution",
+            "example": "Karlsruhe Institute of Technology"
+          },
+          "publicationYear": {
+            "type": "string",
+            "description": "Publication year (could be aquisition year, if publication year is not feasible)",
+            "example": "2017"
+          },
+          "resourceType": {
+            "$ref": "#/components/schemas/ResourceType"
+          },
+          "subjects": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "One or more subjects describing the resource (recommended).",
+            "items": {
+              "$ref": "#/components/schemas/Subject"
+            }
+          },
+          "contributors": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "One or more contributors that have contributed to the resource (recommended).",
+            "items": {
+              "$ref": "#/components/schemas/Contributor"
+            }
+          },
+          "dates": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "One or more dates related to the resource, e.g. creation or publication date (recommended).",
+            "items": {
+              "$ref": "#/components/schemas/Date"
+            }
+          },
+          "relatedIdentifiers": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "One or more related identifiers the can be used to identify related resources, e.g. metadata, parts or derived resources (recommended).",
+            "items": {
+              "$ref": "#/components/schemas/RelatedIdentifier"
+            }
+          },
+          "descriptions": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "One or more description entries providing additional information, e.g. abstract or technical information (recommended).",
+            "items": {
+              "$ref": "#/components/schemas/Description"
+            }
+          },
+          "geoLocations": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "One or more geolocation entries providing information about the location of the resource, e.g. storage or aquisition location (recommended).",
+            "items": {
+              "$ref": "#/components/schemas/GeoLocation"
+            }
+          },
+          "language": {
+            "type": "string",
+            "description": "The primary language of the resource. Possible codes are IETF BCP 47 or ISO 639-1.",
+            "example": "en, de, fr"
+          },
+          "alternateIdentifiers": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "One or more alternate identifiers the can be used to identify the resources in addition to the primary identifier.",
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          "sizes": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Unstructured size information about the resource or its contents.",
+            "example": "15 files, 10 page, 100 bytes",
+            "items": {
+              "type": "string",
+              "description": "Unstructured size information about the resource or its contents.",
+              "example": "15 files, 10 page, 100 bytes"
+            }
+          },
+          "formats": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Format information about the resource or its contents. Preferably, mime types or file extensions are used.",
+            "example": "text/plain, xml, application/pdf",
+            "items": {
+              "type": "string",
+              "description": "Format information about the resource or its contents. Preferably, mime types or file extensions are used.",
+              "example": "text/plain, xml, application/pdf"
+            }
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the resource, e.g. major.minor.",
+            "example": "1.0"
+          },
+          "rights": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Intellectual property information.",
+            "items": {
+              "$ref": "#/components/schemas/Scheme"
+            }
+          },
+          "fundingReferences": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Funding information, e.g. funder, award number and title.",
+            "items": {
+              "$ref": "#/components/schemas/FundingReference"
+            }
+          },
+          "lastUpdate": {
+            "type": "string",
+            "description": "Date at which the last update occured.",
+            "format": "date-time",
+            "example": "2017-05-10T10:41:00Z"
+          },
+          "state": {
+            "type": "string",
+            "description": "State information of the resource. After creation each resource is classified as VOLATILE",
+            "enum": [
+              "VOLATILE",
+              "FIXED",
+              "REVOKED",
+              "GONE"
+            ]
+          },
+          "embargoDate": {
+            "type": "string",
+            "description": "Date at which the embargo ends, e.g. after which the resource is published.",
+            "format": "date-time",
+            "example": "2017-05-10T10:41:00Z"
+          },
+          "acls": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AclEntry"
+            }
+          }
+        },
+        "description": "Data resource element"
+      },
+      "Date": {
+        "required": [
+          "type",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "value": {
+            "type": "string",
+            "description": "The actual date of the entry.",
+            "format": "date-time",
+            "example": "2017-05-10T10:41:00Z"
+          },
+          "type": {
+            "type": "string",
+            "description": "Controlled vocabulary value describing the date type.",
+            "enum": [
+              "ACCEPTED",
+              "AVAILABLE",
+              "COLLECTED",
+              "COPYRIGHTED",
+              "CREATED",
+              "ISSUED",
+              "SUBMITTED",
+              "UPDATED",
+              "VALID",
+              "REVOKED"
+            ]
+          }
+        },
+        "description": "A data entry of a resource."
+      },
+      "Description": {
+        "required": [
+          "description",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "description": {
+            "type": "string",
+            "description": "The actual description as full text."
+          },
+          "type": {
+            "type": "string",
+            "description": "Controlled vocabulary value describing the description type.",
+            "enum": [
+              "ABSTRACT",
+              "METHODS",
+              "SERIES_INFORMATION",
+              "TABLE_OF_CONTENTS",
+              "TECHNICAL_INFO",
+              "OTHER"
+            ]
+          },
+          "lang": {
+            "type": "string",
+            "description": "Description language."
+          }
+        },
+        "description": "A description entry of a resource."
+      },
+      "FunderIdentifier": {
+        "required": [
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "value": {
+            "type": "string"
+          },
+          "identifierType": {
+            "type": "string",
+            "enum": [
+              "ARK",
+              "AR_XIV",
+              "BIBCODE",
+              "DOI",
+              "EAN_13",
+              "EISSN",
+              "HANDLE",
+              "IGSN",
+              "ISBN",
+              "ISSN",
+              "ISTC",
+              "LISSN",
+              "LSID",
+              "PMID",
+              "PURL",
+              "UPC",
+              "URL",
+              "URN",
+              "W_3_ID",
+              "INTERNAL",
+              "OTHER"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "ISNI",
+              "GRID",
+              "CROSSREF_FUNDER_ID",
+              "OTHER"
+            ]
+          }
+        }
+      },
+      "FundingReference": {
+        "required": [
+          "funderName"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "funderName": {
+            "type": "string"
+          },
+          "funderIdentifier": {
+            "$ref": "#/components/schemas/FunderIdentifier"
+          },
+          "awardNumber": {
+            "$ref": "#/components/schemas/Scheme"
+          },
+          "awardUri": {
+            "type": "string"
+          },
+          "awardTitle": {
+            "type": "string"
+          }
+        },
+        "description": "A resource's funding information."
+      },
+      "GeoLocation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "point": {
+            "$ref": "#/components/schemas/Point"
+          },
+          "box": {
+            "$ref": "#/components/schemas/Box"
+          },
+          "polygon": {
+            "$ref": "#/components/schemas/Polygon"
+          },
+          "place": {
+            "type": "string"
+          }
+        },
+        "description": "Geo location information for a resource."
+      },
+      "Identifier": {
+        "required": [
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "value": {
+            "type": "string"
+          },
+          "identifierType": {
+            "type": "string",
+            "enum": [
+              "ARK",
+              "AR_XIV",
+              "BIBCODE",
+              "DOI",
+              "EAN_13",
+              "EISSN",
+              "HANDLE",
+              "IGSN",
+              "ISBN",
+              "ISSN",
+              "ISTC",
+              "LISSN",
+              "LSID",
+              "PMID",
+              "PURL",
+              "UPC",
+              "URL",
+              "URN",
+              "W_3_ID",
+              "INTERNAL",
+              "OTHER"
+            ]
+          }
+        },
+        "description": "One or more alternate identifiers the can be used to identify the resources in addition to the primary identifier."
+      },
+      "Point": {
+        "required": [
+          "latitude",
+          "longitude"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "longitude": {
+            "type": "number",
+            "format": "float"
+          },
+          "latitude": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "description": "Geo location information as point."
+      },
+      "Polygon": {
+        "required": [
+          "points"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "points": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Point"
+            }
+          }
+        },
+        "description": "Geo location information as polygon. A polygon must consist of 4 or more points."
+      },
+      "PrimaryIdentifier": {
+        "required": [
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "value": {
+            "type": "string",
+            "example": "10.1234/foo"
+          },
+          "identifierType": {
+            "type": "string"
+          }
+        }
+      },
+      "RelatedIdentifier": {
+        "required": [
+          "identifierType",
+          "relationType",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "identifierType": {
+            "type": "string",
+            "description": "Controlled vocabulary, e.g. INTERNAL or DOI.",
+            "enum": [
+              "ARK",
+              "AR_XIV",
+              "BIBCODE",
+              "DOI",
+              "EAN_13",
+              "EISSN",
+              "HANDLE",
+              "IGSN",
+              "ISBN",
+              "ISSN",
+              "ISTC",
+              "LISSN",
+              "LSID",
+              "PMID",
+              "PURL",
+              "UPC",
+              "URL",
+              "URN",
+              "W_3_ID",
+              "INTERNAL",
+              "OTHER"
+            ]
+          },
+          "value": {
+            "type": "string",
+            "description": "10.1234/foo"
+          },
+          "relationType": {
+            "type": "string",
+            "description": "Controlled vocabulary value describing the relation type, e.g. IS_PART_OF or IS_METADATA_FOR.",
+            "enum": [
+              "IS_CITED_BY",
+              "CITES",
+              "IS_SUPPLEMENT_TO",
+              "IS_SUPPLEMENTED_BY",
+              "IS_CONTINUED_BY",
+              "CONTINUES",
+              "IS_NEW_VERSION_OF",
+              "IS_PREVIOUS_VERSION_OF",
+              "IS_PART_OF",
+              "HAS_PART",
+              "IS_REFERENCED_BY",
+              "REFERENCES",
+              "IS_DOCUMENTED_BY",
+              "DOCUMENTS",
+              "IS_COMPILED_BY",
+              "COMPILES",
+              "IS_VARIANT_FORM_OF",
+              "IS_ORIGINAL_FORM_OF",
+              "IS_IDENTICAL_TO",
+              "HAS_METADATA",
+              "IS_METADATA_FOR",
+              "REVIEWS",
+              "IS_REVIEWED_BY",
+              "IS_DERIVED_FROM",
+              "IS_SOURCE_OF",
+              "IS_VERSION_OF",
+              "HAS_VERSION",
+              "ISCITEDBY",
+              "ISSUPPLEMENTTO",
+              "ISSUPPLEMENTEDBY",
+              "ISCONTINUEDBY",
+              "ISNEWVERSIONOF",
+              "ISPREVIOUSVERSIONOF",
+              "ISPARTOF",
+              "HASPART",
+              "ISREFERENCEDBY",
+              "ISDOCUMENTEDBY",
+              "ISCOMPILEDBY",
+              "ISVARIANTFORMOF",
+              "ISORIGINALFORMOF",
+              "ISIDENTICALTO",
+              "HASMETADATA",
+              "ISMETADATAFOR",
+              "ISREVIEWEDBY",
+              "ISDERIVEDFROM",
+              "ISSOURCEOF",
+              "ISVERSIONOF",
+              "HASVERSION"
+            ]
+          },
+          "scheme": {
+            "$ref": "#/components/schemas/Scheme"
+          },
+          "relatedMetadataScheme": {
+            "type": "string",
+            "description": "Related metadata scheme."
+          }
+        },
+        "description": "A related identifier for a resource."
+      },
+      "ResourceType": {
+        "required": [
+          "typeGeneral",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "value": {
+            "type": "string",
+            "description": "Measurement Data"
+          },
+          "typeGeneral": {
+            "type": "string",
+            "example": "DATASET",
+            "enum": [
+              "AUDIOVISUAL",
+              "COLLECTION",
+              "DATASET",
+              "EVENT",
+              "IMAGE",
+              "INTERACTIVE_RESOURCE",
+              "MODEL",
+              "PHYSICAL_OBJECT",
+              "SERVICE",
+              "SOFTWARE",
+              "SOUND",
+              "TEXT",
+              "WORKFLOW",
+              "OTHER"
+            ]
+          }
+        },
+        "description": "The type of a resource."
+      },
+      "Scheme": {
+        "required": [
+          "schemeId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "schemeId": {
+            "type": "string",
+            "example": "ORCID"
+          },
+          "schemeUri": {
+            "type": "string",
+            "example": "http://orcid.org/"
+          }
+        },
+        "description": "A scheme mapping consisting of namespace (schemeId) and schemeUri."
+      },
+      "Subject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "value": {
+            "type": "string",
+            "description": "The subject value."
+          },
+          "scheme": {
+            "$ref": "#/components/schemas/Scheme"
+          },
+          "valueUri": {
+            "type": "string",
+            "example": "http://udcdata.info/037278"
+          },
+          "lang": {
+            "type": "string",
+            "example": "en"
+          }
+        },
+        "description": "A subject of a resource, which can either be free text or a value URI."
+      },
+      "Title": {
+        "required": [
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "value": {
+            "type": "string",
+            "example": "My sample resource"
+          },
+          "titleType": {
+            "type": "string",
+            "example": "SUBTITLE",
+            "enum": [
+              "ALTERNATIVE_TITLE",
+              "SUBTITLE",
+              "TRANSLATED_TITLE",
+              "OTHER"
+            ]
+          },
+          "lang": {
+            "type": "string",
+            "example": "en"
+          }
+        },
+        "description": "The title of a resource."
+      },
+      "MetadataRecord": {
+        "required": [
+          "acl",
+          "createdAt",
+          "documentHash",
+          "id",
+          "lastUpdate",
+          "licenseUri",
+          "metadataDocumentUri",
+          "pid",
+          "recordVersion",
+          "relatedResource",
+          "schema",
+          "schemaVersion"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "pid": {
+            "$ref": "#/components/schemas/ResourceIdentifier"
+          },
+          "relatedResource": {
+            "$ref": "#/components/schemas/ResourceIdentifier"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastUpdate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "schema": {
+            "$ref": "#/components/schemas/ResourceIdentifier"
+          },
+          "schemaVersion": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "recordVersion": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "acl": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AclEntry"
+            }
+          },
+          "licenseUri": {
+            "type": "string"
+          },
+          "metadataDocumentUri": {
+            "type": "string"
+          },
+          "documentHash": {
+            "type": "string"
+          }
+        }
+      },
+      "JsonNode": {
+        "type": "object"
+      },
+      "ProxyExchangeJsonNode": {
+        "type": "object"
+      },
+      "ContentInformation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "parentResource": {
+            "$ref": "#/components/schemas/DataResource"
+          },
+          "relativePath": {
+            "type": "string",
+            "description": "The relative path of this element under which the file content is accessible. The path is relative the the resource's 'data' url, e.g. http://hostname:port/api/v1/dataresources/resourceId/data/relativePath"
+          },
+          "version": {
+            "type": "integer",
+            "description": "The version of the metadata of this element. The metadata version may differ from the fileVersion.",
+            "format": "int32"
+          },
+          "fileVersion": {
+            "type": "string",
+            "description": "The version of the file, e.g. the bitstream, associated with this element. The file version may differ from the version, which related to the metadata."
+          },
+          "versioningService": {
+            "type": "string",
+            "description": "Unqiue identifier of the versioning service under which this element is versioned (if configured)."
+          },
+          "depth": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "contentUri": {
+            "type": "string",
+            "description": "The URI where the content is located, e.g. pointing to the remote resource or a local file."
+          },
+          "uploader": {
+            "type": "string",
+            "description": "The uploader of this element."
+          },
+          "mediaType": {
+            "type": "string",
+            "description": "The mediaType, either provided by the uploader or determined by the repository."
+          },
+          "hash": {
+            "type": "string",
+            "description": "The hash of the associated content, either provided by the user (for remote resources) or computed during upload by the repository."
+          },
+          "size": {
+            "type": "integer",
+            "description": "The size of the associated bit stream in bytes.",
+            "format": "int64"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "A key-value map containing additional metadata associated with this element."
+            },
+            "description": "A key-value map containing additional metadata associated with this element."
+          },
+          "tags": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "A list of tags (strings) associated with this element. If a resource has a tag assigned, the tag can be used to access this (and all resources with this tag) directly.",
+            "items": {
+              "type": "string",
+              "description": "A list of tags (strings) associated with this element. If a resource has a tag assigned, the tag can be used to access this (and all resources with this tag) directly."
+            }
+          },
+          "filename": {
+            "type": "string"
+          }
+        },
+        "description": "Content information element referring to a single file or remote reference in the repository."
+      }
+    }
+  }
+}
